@@ -7,7 +7,7 @@ var PV = PsdiumViews = {};
 
 /**
  * Psdium-Views-Quark 类, 命名空间，次级层。
- * @class PV
+ * @class PVQ
  * @constructor
  */
-var PVQ = PV.Quark = {};
+var PVQ = PV.QuarkJs = {};
