@@ -38,15 +38,21 @@ config.projects = [{
         }],
         merge: [{               // javascript 合并配置项。（数组中可配置多个对象）
             dir: [
+                'src/libs/console.js',
+
+                'src/pv.js',
+
                 'src/common/base.js',
                 'src/common/config.js',
                 'src/common/global.js',
-                'src/common/console.js',
 
-                'src/handlers/Bitmap.js',
-                'src/handlers/Button.js',
-                'src/handlers/Text.js',
-
+                'src/handlers/quarkJs/BitmapH.js',
+                'src/handlers/quarkJs/ButtonH.js',
+                'src/handlers/quarkJs/TextH.js',
+                'src/handlers/quarkJs/dispatcher.js',
+                'src/handlers/quarkJs/main.js',
+                
+                'src/dispatcher.js',
                 'src/main.js'
             ],                // 需要合并的 js 文件路径，相对于 rootPath。（必填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）
             outputFile: 'psd2v.pro.jsx'          // 合并后的 js 文件名。 （选填。默认为 merge.js）

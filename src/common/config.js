@@ -3,7 +3,9 @@
  * PSD2V 相关配置文件
  * @constructor
  */
-var Config = Config || {
-    // cm 到 px 转换值
-    PX_BUFFER: 37.795276
-};
+PV.Config = (function() {
+    return {
+        LIB_MODE: ["QuarkJs"],
+        EXPORT_PATH: "/d/Github/Tpsd2v/"
+    }
+})();

@@ -3,17 +3,33 @@
  * PSD2V Global 类
  * @constructor
  */
-var Global = Global || {
-    BITMAP: "Bitmap",
-    BUTTON: "Button",
-    TEXT: "Text",
+PV.Global = (function() {
+    return {
+        // cm 到 px 转换值
+        PX_BUFFER: 37.795276,
+        
+        // cs6 对象
+        ART_LAYER: "ArtLayer",
+        LAYER_SET: "LayerSet",
 
-    ART_LAYER: "ArtLayer",
-    LAYER_SET: "LayerSet",
+        // 导出库
+        LIB_MODE: {
+            QUARK: "QuarkJs"
+        },
 
-    BUTTON_STATUS: {
-        NORMAL: "normal",
-        DOWN: "down",
-        DISABLE: "disable"
+        // QuarkJS 元素
+        QUARK: {
+            ELEMENT: {
+                BITMAP: "Bitmap",
+                BUTTON: "Button",
+                TEXT: "Text"
+            },
+
+            BUTTON_STATUS: {
+                NORMAL: "normal",
+                DOWN: "down",
+                DISABLE: "disable"
+            }
+        }
     }
-};
+})();
