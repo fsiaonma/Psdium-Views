@@ -4,12 +4,26 @@
  */
 PVQ.dispatcher = (function() {
     // 实例化处理方法
-    var BitmapH = null;
+    var ImageH = null;
     var ButtonH = null;
     var TextH = null;
-
+           
     // 返回 PVQ.dispatcher 对象
     return {
+        /**
+         * 分派文件对象处理事件
+         * @params {Object} doc 文件对象
+         * @method processDoc
+         */
+        processDoc: function(doc) {
+            var exName = doc.name.substr(0, doc.name.indexOf("_"));
+            if (exName == PV.Global.QUARK.SLICE) {
+                PVQ.processSliceFile(doc);
+            } else if (exName == PV.Global.QUARK.POS) {
+                PVQ.processPosFile(doc);
+            }
+        },
+
         /**
          * 分派元素处理事件
          * @params {Object} fs 需要读写的文件
@@ -26,11 +40,11 @@ PVQ.dispatcher = (function() {
                     ButtonH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARK.ELEMENT.BITMAP: {
-                    if (!BitmapH) {
-                        BitmapH = new PVQ.BitmapH();
+                case PV.Global.QUARK.ELEMENT.IMAGE: {
+                    if (!ImageH) {
+                        ImageH = new PVQ.ImageH();
                     }
-                    BitmapH.describe(fs, layer);
+                    ImageH.describe(fs, layer);
                     break ;
                 }
                 case PV.Global.QUARK.ELEMENT.TEXT: {

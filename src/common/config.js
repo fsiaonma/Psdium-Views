@@ -5,7 +5,15 @@
  */
 PV.Config = (function() {
     return {
-        LIB_MODE: ["QuarkJs"],
-        EXPORT_PATH: "/d/Github/Tpsd2v/"
+        LIB_MODE: [{
+        	libName: "QuarkJs",
+        	slice: true,
+        	pos: true
+        }],
+
+        EXPORT_PATH: {
+        	SLICE: "/d/Github/Tpsd2v/",
+        	VIEWS: "/d/Github/Tpsd2v/"
+        }
     }
 })();

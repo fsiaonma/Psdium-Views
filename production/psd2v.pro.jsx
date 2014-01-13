@@ -23,10 +23,10 @@ var PV = PsdiumViews = {};
 
 /**
  * Psdium-Views-Quark 类, 命名空间，次级层。
- * @class PV
+ * @class PVQ
  * @constructor
  */
-var PVQ = PV.Quark = {};
+var PVQ = PV.QuarkJs = {};
 
 /**
  * Base 
@@ -57,8 +57,16 @@ PV.Base = (function() {
  */
 PV.Config = (function() {
     return {
-        LIB_MODE: ["QuarkJs"],
-        EXPORT_PATH: "/d/Github/Tpsd2v/"
+        LIB_MODE: [{
+        	libName: "QuarkJs",
+        	slice: true,
+        	pos: true
+        }],
+
+        EXPORT_PATH: {
+        	SLICE: "/d/Github/Tpsd2v/",
+        	VIEWS: "/d/Github/Tpsd2v/"
+        }
     }
 })();
 
@@ -83,14 +91,18 @@ PV.Global = (function() {
 
         // QuarkJS 元素
         QUARK: {
+            SLICE: "Slice",
+
+            POS: "Pos",
+
             ELEMENT: {
-                BITMAP: "Bitmap",
+                IMAGE: "Image",
                 BUTTON: "Button",
                 TEXT: "Text"
             },
 
             BUTTON_STATUS: {
-                NORMAL: "normal",
+                UP: "up",
                 DOWN: "down",
                 DISABLE: "disable"
             }
@@ -99,11 +111,88 @@ PV.Global = (function() {
 })();
 
 /**
+ * Psdium-Views quarkJs 切片文件处理方法
+ * @params {Objcet} doc 当前文本对象
+ * @method processSliceFile
+ */
+PVQ.processSliceFile = function(doc) {
+    var fs = File(PV.Config.EXPORT_PATH.SLICE + "Slice.js");
+
+    if (fs.exists) {
+    	fs.open("e:");
+    	fs.seek(0, 2);
+    } else {
+    	fs = new File(PV.Config.EXPORT_PATH.SLICE + "Slice.js");
+    	fs.open("e:");
+    	fs.writeln("Slice = window.Slice || {};");
+    }
+
+    fs.encoding = "utf-8";
+    
+    fs.writeln("");
+
+    var str = "";
+
+    var name = doc.name.substr(0, doc.name.indexOf("."));
+	fs.writeln("Slice['" + name + ".png'] = {");
+    for (var i = 0, len = doc.layers.length; i < len; ++i) {
+    	var layer = doc.layers[i];
+		if (str != "") {
+			fs.write(",\n");
+		}
+
+		var name = layer.name;
+		var x = Math.round(layer.bounds[0]);
+        var y = Math.round(layer.bounds[1]);
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
+
+        str = "\t'" + name + "':[" + x + ", " + y + ", " + width + ", " + height + "]";
+		fs.write(str);
+    }
+    fs.writeln("\n};");
+
+    fs.close();
+};
+
+/**
+ * Psdium-Views quarkJs 对位文件处理方法
+ * @params {Objcet} doc 当前文本对象
+ * @method processPosFile
+ */
+PVQ.processPosFile = function(doc) {
+    var docName = doc.name;
+    var strStart = docName.indexOf("_") + 1;
+    var strLen = docName.indexOf(".") - strStart;
+    var vName = docName.substr(strStart, strLen) + "V";
+
+    var fs = new File(PV.Config.EXPORT_PATH.VIEWS + vName + ".js");
+    fs.encoding = "utf-8";
+
+    fs.open("w:");
+
+    fs.writeln(
+        "var " + vName + " = G.Container.getClass().extend({\n" +
+        "\tinit:function(){\n\n" + 
+        "\t\tthis._super(arguments);\n"
+    );
+
+    PV.Base.walk(doc.layers, function(layer, type) {
+        PVQ.dispatcher.processElements(fs, layer, type);
+    });
+    
+    fs.writeln("\t}");
+    fs.writeln("});");
+
+    fs.close();
+};
+
+/**
  * Bitmap 
  * PSD2V Bitmap 处理方法
  * @constructor
  */
-PVQ.BitmapH = function() {
+PVQ.ImageH = function() {
     /**
      * 修饰 Bitmap 类
      * @params {Objcet} fs 要写入的文件
@@ -111,19 +200,19 @@ PVQ.BitmapH = function() {
      * @method describe
      */
     this.describe = function(fs, layer) {
-        if (layer.typename == PV.Global.ART_LAYER) {
-            var name = layer.name;
-            var x = Math.round(layer.bounds[0] * PV.Global.PX_BUFFER);
-            var y = Math.round(layer.bounds[1] * PV.Global.PX_BUFFER);
-            var width = Math.round(layer.bounds[2] * PV.Global.PX_BUFFER);
-            var height = Math.round(layer.bounds[3] * PV.Global.PX_BUFFER);
+        var imageLayer = layer.layers[0];
 
-            var str = "\t\tvar " + name + " = G.Bitmap.create({slice: G.getSlice('" + name + "')});\n" + 
-                      "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                      "\t\tthis.addChild(" + name + ");\n";
+        var name = imageLayer.name;
+        var x = Math.round(imageLayer.bounds[0]);
+        var y = Math.round(imageLayer.bounds[1]);
+        var width = Math.round(imageLayer.bounds[2]) - x;
+        var height = Math.round(imageLayer.bounds[3]) - y;
 
-            fs.writeln(str);
-        }
+        var str = "\t\tvar " + name + " = G.Bitmap.create({slice: G.getSlice('" + name + "')});\n" + 
+                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\tthis.addChild(" + name + ");\n";
+
+        fs.writeln(str);
     }
 };
 
@@ -141,36 +230,37 @@ PVQ.ButtonH = function() {
      */
     this.describe = function(fs, layer) {
         var name = layer.name;
-        var x = Math.round(layer.bounds[0] * PV.Global.PX_BUFFER);
-        var y = Math.round(layer.bounds[1] * PV.Global.PX_BUFFER);
-        var width = Math.round(layer.bounds[2] * PV.Global.PX_BUFFER);
-        var height = Math.round(layer.bounds[3] * PV.Global.PX_BUFFER);
+        var x = Math.round(layer.bounds[0]);
+        var y = Math.round(layer.bounds[1]);
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
 
-        var normal, down, disable;
+        var up, down, disable;
 
-        (function(layer) {
-            if (layer.typename == PV.Global.LAYER_SET) {
-                for (var i = 0, len = layer.layers.length; i < len; ++i) {
-                    arguments.callee(layer.layers[i]);
-                }
-            } else if (layer.typename == PV.Global.ART_LAYER) {
-                var exName = layer.name.substr(0, layer.name.indexOf("_"));
-                switch (exName) {
-                    case PV.Global.QUARK.BUTTON_STATUS.NORMAL: {
-                        normal = layer.name;
-                        break ;
+        for (var i = 0, len = layer.layers.length; i < len; ++i) {
+            var status = layer.layers[i];
+            var type = status.name;
+            switch (type) {
+                case PV.Global.QUARK.BUTTON_STATUS.UP: {
+                    if (status.layers && status.layers.length > 0) {
+                        up = status.layers[0].name;
                     }
-                    case PV.Global.QUARK.BUTTON_STATUS.DOWN: {
-                        down = layer.name;
-                        break ;
-                    }
-                    case PV.Global.QUARK.BUTTON_STATUS.DISABLE: {
-                        disable = layer.name;
-                        break ;
-                    } 
+                    break ;
                 }
+                case PV.Global.QUARK.BUTTON_STATUS.DOWN: {
+                    if (status.layers && status.layers.length > 0) {
+                        down = status.layers[0].name;
+                    }
+                    break ;
+                }
+                case PV.Global.QUARK.BUTTON_STATUS.DISABLE: {
+                    if (status.layers && status.layers.length > 0) {
+                        disable = status.layers[0].name;
+                    }
+                    break ;
+                } 
             }
-        })(layer);
+        }
 
         var current = "";
 
@@ -180,8 +270,8 @@ PVQ.ButtonH = function() {
             imgDisable: ""
         }
 
-        if (normal) {
-            strs.imgUp = "\t\t\timgUp: G.getSlice('" + normal + "')";
+        if (up) {
+            strs.imgUp = "\t\t\timgUp: G.getSlice('" + up + "')";
             current = "imgUp";
         }
 
@@ -220,7 +310,32 @@ PVQ.TextH = function() {
      * @method describe
      */
     this.describe = function(fs, layer) {
-        console.log(layer.name);
+        var name = layer.name;
+
+        var textLayer = layer.layers[0];
+        var x = Math.round(textLayer.bounds[0]);
+        var y = Math.round(textLayer.bounds[1]);
+        var width = Math.round(textLayer.bounds[2]) - x;
+        var height = Math.round(textLayer.bounds[3]) - y;
+        var fontSize = Math.round(textLayer.textItem.size);
+        var lineHeight = Math.round(textLayer.textItem.leading);
+        var align =  textLayer.textItem.justification.toString().split(".")[1].toLowerCase();
+
+        var color = textLayer.textItem.color.rgb.hexValue;
+        var content = textLayer.textItem.contents.replace(/\r/gi, "");
+
+
+        var str = "\t\tvar " + name + " = G.Text.create();\n" + 
+                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setFontSize(" + fontSize + ");\n" + 
+                  "\t\t" + name + ".setWidth(" + width + ");\n" +
+                  "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
+                  "\t\t" + name + ".setColor('#" + color + "');\n" + 
+                  "\t\t" + name + ".setTextAlign('" + align + "');\n" + 
+                  "\t\t" + name + ".setText('" + content + "');\n" + 
+                  "\t\tthis.addChild(" + name + ");\n";
+
+        fs.writeln(str);
     }
 };
 
@@ -230,12 +345,26 @@ PVQ.TextH = function() {
  */
 PVQ.dispatcher = (function() {
     // 实例化处理方法
-    var BitmapH = null;
+    var ImageH = null;
     var ButtonH = null;
     var TextH = null;
-
+           
     // 返回 PVQ.dispatcher 对象
     return {
+        /**
+         * 分派文件对象处理事件
+         * @params {Object} doc 文件对象
+         * @method processDoc
+         */
+        processDoc: function(doc) {
+            var exName = doc.name.substr(0, doc.name.indexOf("_"));
+            if (exName == PV.Global.QUARK.SLICE) {
+                PVQ.processSliceFile(doc);
+            } else if (exName == PV.Global.QUARK.POS) {
+                PVQ.processPosFile(doc);
+            }
+        },
+
         /**
          * 分派元素处理事件
          * @params {Object} fs 需要读写的文件
@@ -252,11 +381,11 @@ PVQ.dispatcher = (function() {
                     ButtonH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARK.ELEMENT.BITMAP: {
-                    if (!BitmapH) {
-                        BitmapH = new PVQ.BitmapH();
+                case PV.Global.QUARK.ELEMENT.IMAGE: {
+                    if (!ImageH) {
+                        ImageH = new PVQ.ImageH();
                     }
-                    BitmapH.describe(fs, layer);
+                    ImageH.describe(fs, layer);
                     break ;
                 }
                 case PV.Global.QUARK.ELEMENT.TEXT: {
@@ -279,32 +408,22 @@ PVQ.dispatcher = (function() {
  * @params {Objcet} application psd 应用程序
  * @method 
  */
-PVQ.Main = function(app) {
+PVQ.main = function(app) {
+	// 导出切片文件前处理
+    for (var i = 0, len = PV.Config.LIB_MODE.length; i < len; ++i) {
+        var mode = PV.Config.LIB_MODE[i];
+        if (mode.libName == PV.Global.LIB_MODE.QUARK && mode.slice) {
+        	var fs = File(PV.Config.EXPORT_PATH.SLICE + "Slice.js");
+        	if (fs.exists) {
+        		fs.remove();
+        	}
+        }
+    }
+
 	// 处理函数主入口
 	if (app.documents) {
         for (var i = 0, len = app.documents.length; i < len; ++i) {
-            var currentDoc = app.documents[i];
-            var vName = currentDoc.name.substr(0, currentDoc.name.indexOf(".")) + "V";
-
-            var folder = new Folder(PV.Config.EXPORT_PATH + "QuarkJs/");
-            var res = folder.create();
-            if (res) {
-                var fs = new File(PV.Config.EXPORT_PATH + "QuarkJs/" + vName + ".js");
-                fs.open("w:");
-                fs.writeln(
-                    "var " + vName + " = G.Container.getClass().extend({\n" +
-                    "\tinit:function(){\n\n" + 
-                    "\t\tthis._super(arguments);\n"
-                );
-
-                PV.Base.walk(currentDoc.layers, function(layer, type) {
-                    PVQ.dispatcher.processElements(fs, layer, type);
-                });
-
-                fs.writeln("\t}");
-                fs.writeln("});");
-                fs.close();
-            }
+            PVQ.dispatcher.processDoc(app.documents[i]);
         }
     }
 };
@@ -323,7 +442,7 @@ PV.dispatcher = (function() {
         expoortLibMode: function(mode, app) {
             switch(mode) {
                 case PV.Global.LIB_MODE.QUARK: {
-                    PVQ.Main(app);
+                    PVQ.main(app);
                     break ;
                 }
             }
@@ -337,9 +456,15 @@ PV.dispatcher = (function() {
  * @method 
  */
 (function(app) {
+	// 转换长度单位为像素
+	preferences.rulerUnits = Units.PIXELS;
+	
+	// 禁止弹出框
+	displayDialogs =DialogModes.NO;
+
     // 遍历需要导出的库
     for (var i = 0, len = PV.Config.LIB_MODE.length; i < len; ++i) {
-        var mode = PV.Config.LIB_MODE[i];
+        var mode = PV.Config.LIB_MODE[i].libName;
         if (app) {
             PV.dispatcher.expoortLibMode(mode, app);
         }

@@ -12,36 +12,37 @@ PVQ.ButtonH = function() {
      */
     this.describe = function(fs, layer) {
         var name = layer.name;
-        var x = Math.round(layer.bounds[0] * PV.Global.PX_BUFFER);
-        var y = Math.round(layer.bounds[1] * PV.Global.PX_BUFFER);
-        var width = Math.round(layer.bounds[2] * PV.Global.PX_BUFFER);
-        var height = Math.round(layer.bounds[3] * PV.Global.PX_BUFFER);
+        var x = Math.round(layer.bounds[0]);
+        var y = Math.round(layer.bounds[1]);
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
 
-        var normal, down, disable;
+        var up, down, disable;
 
-        (function(layer) {
-            if (layer.typename == PV.Global.LAYER_SET) {
-                for (var i = 0, len = layer.layers.length; i < len; ++i) {
-                    arguments.callee(layer.layers[i]);
-                }
-            } else if (layer.typename == PV.Global.ART_LAYER) {
-                var exName = layer.name.substr(0, layer.name.indexOf("_"));
-                switch (exName) {
-                    case PV.Global.QUARK.BUTTON_STATUS.NORMAL: {
-                        normal = layer.name;
-                        break ;
+        for (var i = 0, len = layer.layers.length; i < len; ++i) {
+            var status = layer.layers[i];
+            var type = status.name;
+            switch (type) {
+                case PV.Global.QUARK.BUTTON_STATUS.UP: {
+                    if (status.layers && status.layers.length > 0) {
+                        up = status.layers[0].name;
                     }
-                    case PV.Global.QUARK.BUTTON_STATUS.DOWN: {
-                        down = layer.name;
-                        break ;
-                    }
-                    case PV.Global.QUARK.BUTTON_STATUS.DISABLE: {
-                        disable = layer.name;
-                        break ;
-                    } 
+                    break ;
                 }
+                case PV.Global.QUARK.BUTTON_STATUS.DOWN: {
+                    if (status.layers && status.layers.length > 0) {
+                        down = status.layers[0].name;
+                    }
+                    break ;
+                }
+                case PV.Global.QUARK.BUTTON_STATUS.DISABLE: {
+                    if (status.layers && status.layers.length > 0) {
+                        disable = status.layers[0].name;
+                    }
+                    break ;
+                } 
             }
-        })(layer);
+        }
 
         var current = "";
 
@@ -51,8 +52,8 @@ PVQ.ButtonH = function() {
             imgDisable: ""
         }
 
-        if (normal) {
-            strs.imgUp = "\t\t\timgUp: G.getSlice('" + normal + "')";
+        if (up) {
+            strs.imgUp = "\t\t\timgUp: G.getSlice('" + up + "')";
             current = "imgUp";
         }
 

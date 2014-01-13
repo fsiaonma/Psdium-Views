@@ -19,14 +19,18 @@ PV.Global = (function() {
 
         // QuarkJS 元素
         QUARK: {
+            SLICE: "Slice",
+
+            POS: "Pos",
+
             ELEMENT: {
-                BITMAP: "Bitmap",
+                IMAGE: "Image",
                 BUTTON: "Button",
                 TEXT: "Text"
             },
 
             BUTTON_STATUS: {
-                NORMAL: "normal",
+                UP: "up",
                 DOWN: "down",
                 DISABLE: "disable"
             }

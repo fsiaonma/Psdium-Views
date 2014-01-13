@@ -46,9 +46,11 @@ config.projects = [{
                 'src/common/config.js',
                 'src/common/global.js',
 
-                'src/handlers/quarkJs/BitmapH.js',
-                'src/handlers/quarkJs/ButtonH.js',
-                'src/handlers/quarkJs/TextH.js',
+                'src/handlers/quarkJs/DocsH/SliceH.js',
+                'src/handlers/quarkJs/DocsH/PosH.js',
+                'src/handlers/quarkJs/ElementsH/ImageH.js',
+                'src/handlers/quarkJs/ElementsH/ButtonH.js',
+                'src/handlers/quarkJs/ElementsH/TextH.js',
                 'src/handlers/quarkJs/dispatcher.js',
                 'src/handlers/quarkJs/main.js',
                 
