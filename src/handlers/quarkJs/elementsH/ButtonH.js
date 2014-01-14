@@ -23,19 +23,19 @@ PVQ.ButtonH = function() {
             var status = layer.layers[i];
             var type = status.name;
             switch (type) {
-                case PV.Global.QUARK.BUTTON_STATUS.UP: {
+                case PV.Global.QUARKJS.BUTTON_STATUS.UP: {
                     if (status.layers && status.layers.length > 0) {
                         up = status.layers[0].name;
                     }
                     break ;
                 }
-                case PV.Global.QUARK.BUTTON_STATUS.DOWN: {
+                case PV.Global.QUARKJS.BUTTON_STATUS.DOWN: {
                     if (status.layers && status.layers.length > 0) {
                         down = status.layers[0].name;
                     }
                     break ;
                 }
-                case PV.Global.QUARK.BUTTON_STATUS.DISABLE: {
+                case PV.Global.QUARKJS.BUTTON_STATUS.DISABLE: {
                     if (status.layers && status.layers.length > 0) {
                         disable = status.layers[0].name;
                     }

@@ -11,10 +11,9 @@
 	displayDialogs =DialogModes.NO;
 
     // 遍历需要导出的库
-    for (var i = 0, len = PV.Config.LIB_MODE.length; i < len; ++i) {
-        var mode = PV.Config.LIB_MODE[i].libName;
+    for (var key in PV.Config.LIB_MODE) {
         if (app) {
-            PV.dispatcher.expoortLibMode(mode, app);
+            PV.dispatcher.expoortLibMode(key, app);
         }
     }
 })(app);

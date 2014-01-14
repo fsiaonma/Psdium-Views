@@ -14,15 +14,11 @@ PV.Global = (function() {
 
         // 导出库
         LIB_MODE: {
-            QUARK: "QuarkJs"
+            QUARKJS: "QUARKJS"
         },
 
         // QuarkJS 元素
-        QUARK: {
-            SLICE: "Slice",
-
-            POS: "Pos",
-
+        QUARKJS: {
             ELEMENT: {
                 IMAGE: "Image",
                 BUTTON: "Button",

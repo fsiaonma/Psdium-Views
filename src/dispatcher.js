@@ -11,7 +11,7 @@ PV.dispatcher = (function() {
          */
         expoortLibMode: function(mode, app) {
             switch(mode) {
-                case PV.Global.LIB_MODE.QUARK: {
+                case PV.Global.LIB_MODE.QUARKJS: {
                     PVQ.main(app);
                     break ;
                 }
