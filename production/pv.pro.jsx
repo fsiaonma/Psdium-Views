@@ -66,13 +66,13 @@ PV.Config = (function() {
         LIB_MODE: {
         	QUARKJS: {
                 SOURCE_PATH: {
-                    SLICE: "/d/Github/Tpsd2v/切片/",
-                    POS: "/d/Github/Tpsd2v/对位/"
+                    SLICE: "/d/Github/Psdium-Views/demo/ui_slice/",
+                    POS: "/d/Github/Psdium-Views/demo/ui_pos/"
                 },
                 EXPORT_PATH: {
-                    SLICE: "/c/wamp/www/workplace/testPSD2V/scripts/configs/",
-                    POS: "/c/wamp/www/workplace/testPSD2V/scripts/views/",
-                    IMAGE: "/c/wamp/www/workplace/testPSD2V/images/"
+                    SLICE: "/d/Github/Psdium-Views/demo/r_d_slice/",
+                    POS: "/d/Github/Psdium-Views/demo/r_d_pos/",
+                    IMAGE: "/d/Github/Psdium-Views/demo/r_d_images/"
                 }
             }
         }
