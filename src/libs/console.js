@@ -10,6 +10,10 @@ var console = console || {
      * @method log
      */
     log: function(msg) {
-        $.writeln(msg);
+    	if (PV.Config.DEBUG) {
+    		$.writeln(msg);
+    	} else {
+    		alert(msg);
+    	}
     }
 };

@@ -5,6 +5,8 @@
  */
 PV.Config = (function() {
     return {
+        DEBUG: true,
+
         LIB_MODE: {
         	QUARKJS: {
                 SOURCE_PATH: {
@@ -17,6 +19,6 @@ PV.Config = (function() {
                     IMAGE: "/c/wamp/www/workplace/testPSD2V/images/"
                 }
             }
-        },
+        }
     }
 })();

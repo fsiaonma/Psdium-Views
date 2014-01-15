@@ -1,5 +1,5 @@
 /**
- * Text 
+ * TextH 
  * PSD2V Text 处理方法
  * @constructor
  */
@@ -25,6 +25,9 @@ PVQ.TextH = function() {
         var color = textLayer.textItem.color.rgb.hexValue;
         var content = textLayer.textItem.contents.replace(/\r/gi, "");
 
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
 
         var str = "\t\tvar " + name + " = G.Text.create();\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
@@ -34,8 +37,10 @@ PVQ.TextH = function() {
                   "\t\t" + name + ".setColor('#" + color + "');\n" + 
                   "\t\t" + name + ".setTextAlign('" + align + "');\n" + 
                   "\t\t" + name + ".setText('" + content + "');\n" + 
-                  "\t\tthis.addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
     }
 };
+
+PVQ.TextH.prototype = new PVQ.BaseH();

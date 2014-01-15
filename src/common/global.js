@@ -5,9 +5,6 @@
  */
 PV.Global = (function() {
     return {
-        // cm 到 px 转换值
-        PX_BUFFER: 37.795276,
-        
         // cs6 对象
         ART_LAYER: "ArtLayer",
         LAYER_SET: "LayerSet",
@@ -22,7 +19,8 @@ PV.Global = (function() {
             ELEMENT: {
                 IMAGE: "Image",
                 BUTTON: "Button",
-                TEXT: "Text"
+                TEXT: "Text",
+                CONTAINER: "Container"
             },
 
             BUTTON_STATUS: {

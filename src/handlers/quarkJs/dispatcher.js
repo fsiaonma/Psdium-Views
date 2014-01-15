@@ -4,9 +4,10 @@
  */
 PVQ.dispatcher = (function() {
     // 实例化处理方法
-    var ImageH = null;
-    var ButtonH = null;
-    var TextH = null;
+    var imageH = null;
+    var buttonH = null;
+    var textH = null;
+    var containerH = null; 
            
     // 返回 PVQ.dispatcher 对象
     return {
@@ -39,33 +40,41 @@ PVQ.dispatcher = (function() {
          * @params {Object} fs 需要读写的文件
          * @params {Object} layer 当前需要处理的图层
          * @params {String} type 分派类型
+         * @params {Container} ppos 坐标偏移量
          * @method switchElement
          */
         processElements: function(fs, layer, type) {
             switch (type) {
                 case PV.Global.QUARKJS.ELEMENT.BUTTON: {
-                    if (!ButtonH) {
-                        ButtonH = new PVQ.ButtonH();
+                    if (!buttonH) {
+                        buttonH = new PVQ.ButtonH();
                     }
-                    ButtonH.describe(fs, layer);
+                    buttonH.describe(fs, layer);
                     break ;
                 }
                 case PV.Global.QUARKJS.ELEMENT.IMAGE: {
-                    if (!ImageH) {
-                        ImageH = new PVQ.ImageH();
+                    if (!imageH) {
+                        imageH = new PVQ.ImageH();
                     }
-                    ImageH.describe(fs, layer);
+                    imageH.describe(fs, layer);
                     break ;
                 }
                 case PV.Global.QUARKJS.ELEMENT.TEXT: {
-                    if (!TextH) {
-                        TextH = new PVQ.TextH();
+                    if (!textH) {
+                        textH = new PVQ.TextH();
                     }
-                    TextH.describe(fs, layer);
+                    textH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.CONTAINER: {
+                    if (!containerH) {
+                        containerH = new PVQ.ContainerH();
+                    }
+                    containerH.describe(fs, layer);
                     break ;
                 }
                 default: {
-                    console.log("找不到类型: " + type);
+                    console.log("找不到类型: " + type + ", 图层名: " + layer.name);
                 }
             }
         }

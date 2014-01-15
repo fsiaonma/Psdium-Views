@@ -1,6 +1,6 @@
 /**
- * Bitmap 
- * PSD2V Bitmap 处理方法
+ * ImageH 
+ * PSD2V Image 处理方法
  * @constructor
  */
 PVQ.ImageH = function() {
@@ -19,10 +19,16 @@ PVQ.ImageH = function() {
         var width = Math.round(imageLayer.bounds[2]) - x;
         var height = Math.round(imageLayer.bounds[3]) - y;
 
-        var str = "\t\tvar " + name + " = G.Bitmap.create({slice: G.getSlice('" + name + "')});\n" + 
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
+
+        var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\tthis.addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
     }
 };
+
+PVQ.ImageH.prototype = new PVQ.BaseH();

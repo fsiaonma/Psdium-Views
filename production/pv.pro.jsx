@@ -10,7 +10,11 @@ var console = console || {
      * @method log
      */
     log: function(msg) {
-        $.writeln(msg);
+    	if (PV.Config.DEBUG) {
+    		$.writeln(msg);
+    	} else {
+    		alert(msg);
+    	}
     }
 };
 
@@ -57,6 +61,8 @@ PV.Base = (function() {
  */
 PV.Config = (function() {
     return {
+        DEBUG: true,
+
         LIB_MODE: {
         	QUARKJS: {
                 SOURCE_PATH: {
@@ -69,7 +75,7 @@ PV.Config = (function() {
                     IMAGE: "/c/wamp/www/workplace/testPSD2V/images/"
                 }
             }
-        },
+        }
     }
 })();
 
@@ -80,9 +86,6 @@ PV.Config = (function() {
  */
 PV.Global = (function() {
     return {
-        // cm 到 px 转换值
-        PX_BUFFER: 37.795276,
-        
         // cs6 对象
         ART_LAYER: "ArtLayer",
         LAYER_SET: "LayerSet",
@@ -97,7 +100,8 @@ PV.Global = (function() {
             ELEMENT: {
                 IMAGE: "Image",
                 BUTTON: "Button",
-                TEXT: "Text"
+                TEXT: "Text",
+                CONTAINER: "Container"
             },
 
             BUTTON_STATUS: {
@@ -209,8 +213,40 @@ PVQ.processPosFile = (function() {
 })();
 
 /**
- * Bitmap 
- * PSD2V Bitmap 处理方法
+ * BaseH 
+ * PSD2V Base 处理方法
+ * @constructor
+ */
+PVQ.BaseH = function() {
+    /**
+     * 获取当前图层父节点相应属性
+     * @params {Object} layer 当前需要处理的图层
+     * @method getParent
+     */
+    this.getParent = function(layer) {
+        var pos, name;
+
+        var parent = layer.parent;
+        var type = parent.name.substr(0, parent.name.indexOf("_"));
+
+        if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER) {
+            name = parent.name;
+            pos = [Math.round(parent.bounds[0]), Math.round(parent.bounds[1])];
+        } else {
+            name = "this";
+            pos = [0, 0];
+        }
+
+        return {
+            pos: pos,
+            name: name 
+        }
+    }
+};
+
+/**
+ * ImageH 
+ * PSD2V Image 处理方法
  * @constructor
  */
 PVQ.ImageH = function() {
@@ -229,16 +265,22 @@ PVQ.ImageH = function() {
         var width = Math.round(imageLayer.bounds[2]) - x;
         var height = Math.round(imageLayer.bounds[3]) - y;
 
-        var str = "\t\tvar " + name + " = G.Bitmap.create({slice: G.getSlice('" + name + "')});\n" + 
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
+
+        var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\tthis.addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
     }
 };
 
+PVQ.ImageH.prototype = new PVQ.BaseH();
+
 /**
- * Button 
+ * ButtonH 
  * PSD2V Button 处理方法
  * @constructor
  */
@@ -307,19 +349,25 @@ PVQ.ButtonH = function() {
             strs.imgDisable = disable? "\t\t\t,imgDisable: G.getSlice('" + disable + "')\n" : '';
             current = "imgDisable";
         }
+
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
        
         var str = "\t\tvar " + name + " = G.Button.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + "\n" + 
                   "\t\t});\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\tthis.addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
     }
 };
 
+PVQ.ButtonH.prototype = new PVQ.BaseH();
+
 /**
- * Text 
+ * TextH 
  * PSD2V Text 处理方法
  * @constructor
  */
@@ -345,6 +393,9 @@ PVQ.TextH = function() {
         var color = textLayer.textItem.color.rgb.hexValue;
         var content = textLayer.textItem.contents.replace(/\r/gi, "");
 
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
 
         var str = "\t\tvar " + name + " = G.Text.create();\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
@@ -354,11 +405,52 @@ PVQ.TextH = function() {
                   "\t\t" + name + ".setColor('#" + color + "');\n" + 
                   "\t\t" + name + ".setTextAlign('" + align + "');\n" + 
                   "\t\t" + name + ".setText('" + content + "');\n" + 
-                  "\t\tthis.addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
     }
 };
+
+PVQ.TextH.prototype = new PVQ.BaseH();
+
+/**
+ * ContainerH 
+ * PSD2V Container 处理方法
+ * @constructor
+ */
+PVQ.ContainerH = function() {
+	/**
+     * 修饰 Container 类
+     * @params {Objcet} fs 要写入的文件
+     * @params {Object} layer 当前需要处理的图层
+     * @method describe
+     */
+    this.describe = function(fs, layer) {
+        var containerLayer = layer;
+
+        var name = containerLayer.name;
+        var x = Math.round(containerLayer.bounds[0]);
+        var y = Math.round(containerLayer.bounds[1]);
+        var width = Math.round(containerLayer.bounds[2]) - x;
+        var height = Math.round(containerLayer.bounds[3]) - y;
+
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
+
+        var str = "\t\tvar " + name + " = G.Container.create();\n" + 
+                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+
+        fs.writeln(str);
+
+       	PV.Base.walk(containerLayer.layers, function(layer, type) {
+            PVQ.dispatcher.processElements(fs, layer, type);
+        });
+    }
+};
+
+PVQ.ContainerH.prototype = new PVQ.BaseH();
 
 /**
  * PVQ.dipatcher QuarkJs 元素处理分派器
@@ -366,9 +458,10 @@ PVQ.TextH = function() {
  */
 PVQ.dispatcher = (function() {
     // 实例化处理方法
-    var ImageH = null;
-    var ButtonH = null;
-    var TextH = null;
+    var imageH = null;
+    var buttonH = null;
+    var textH = null;
+    var containerH = null; 
            
     // 返回 PVQ.dispatcher 对象
     return {
@@ -401,33 +494,41 @@ PVQ.dispatcher = (function() {
          * @params {Object} fs 需要读写的文件
          * @params {Object} layer 当前需要处理的图层
          * @params {String} type 分派类型
+         * @params {Container} ppos 坐标偏移量
          * @method switchElement
          */
         processElements: function(fs, layer, type) {
             switch (type) {
                 case PV.Global.QUARKJS.ELEMENT.BUTTON: {
-                    if (!ButtonH) {
-                        ButtonH = new PVQ.ButtonH();
+                    if (!buttonH) {
+                        buttonH = new PVQ.ButtonH();
                     }
-                    ButtonH.describe(fs, layer);
+                    buttonH.describe(fs, layer);
                     break ;
                 }
                 case PV.Global.QUARKJS.ELEMENT.IMAGE: {
-                    if (!ImageH) {
-                        ImageH = new PVQ.ImageH();
+                    if (!imageH) {
+                        imageH = new PVQ.ImageH();
                     }
-                    ImageH.describe(fs, layer);
+                    imageH.describe(fs, layer);
                     break ;
                 }
                 case PV.Global.QUARKJS.ELEMENT.TEXT: {
-                    if (!TextH) {
-                        TextH = new PVQ.TextH();
+                    if (!textH) {
+                        textH = new PVQ.TextH();
                     }
-                    TextH.describe(fs, layer);
+                    textH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.CONTAINER: {
+                    if (!containerH) {
+                        containerH = new PVQ.ContainerH();
+                    }
+                    containerH.describe(fs, layer);
                     break ;
                 }
                 default: {
-                    console.log("找不到类型: " + type);
+                    console.log("找不到类型: " + type + ", 图层名: " + layer.name);
                 }
             }
         }

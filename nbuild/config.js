@@ -48,16 +48,19 @@ config.projects = [{
 
                 'src/handlers/quarkJs/DocsH/SliceH.js',
                 'src/handlers/quarkJs/DocsH/PosH.js',
+
+                'src/handlers/quarkJs/ElementsH/BaseH.js',
                 'src/handlers/quarkJs/ElementsH/ImageH.js',
                 'src/handlers/quarkJs/ElementsH/ButtonH.js',
                 'src/handlers/quarkJs/ElementsH/TextH.js',
+                'src/handlers/quarkJs/ElementsH/ContainerH.js',
                 'src/handlers/quarkJs/dispatcher.js',
                 'src/handlers/quarkJs/main.js',
                 
                 'src/dispatcher.js',
                 'src/main.js'
             ],                // 需要合并的 js 文件路径，相对于 rootPath。（必填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）
-            outputFile: 'psd2v.pro.jsx'          // 合并后的 js 文件名。 （选填。默认为 merge.js）
+            outputFile: 'pv.pro.jsx'          // 合并后的 js 文件名。 （选填。默认为 merge.js）
         }],
         copyOnly: [],           // 需要复制的 js 文件路径，相对于 rootPath。（选填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）
         ignore: []              // 不用打包的 js 文件路径，相对于 rootPath。（选填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）

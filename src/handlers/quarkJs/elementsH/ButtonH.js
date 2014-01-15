@@ -1,5 +1,5 @@
 /**
- * Button 
+ * ButtonH 
  * PSD2V Button 处理方法
  * @constructor
  */
@@ -68,13 +68,19 @@ PVQ.ButtonH = function() {
             strs.imgDisable = disable? "\t\t\t,imgDisable: G.getSlice('" + disable + "')\n" : '';
             current = "imgDisable";
         }
+
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
        
         var str = "\t\tvar " + name + " = G.Button.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + "\n" + 
                   "\t\t});\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\tthis.addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
     }
 };
+
+PVQ.ButtonH.prototype = new PVQ.BaseH();
