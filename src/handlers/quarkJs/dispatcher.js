@@ -12,6 +12,7 @@ PVQ.dispatcher = (function() {
     var switchH = null;
     var inputH = null;
     var animationH = null;
+    var dragPanelH = null;
            
     // 返回 PVQ.dispatcher 对象
     return {
@@ -109,6 +110,13 @@ PVQ.dispatcher = (function() {
                         animationH = new PVQ.AnimationH();
                     }
                     animationH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.DRAGPANEL: {
+                    if (!dragPanelH) {
+                        dragPanelH = new PVQ.DragPanelH();
+                    }
+                    dragPanelH.describe(fs, layer);
                     break ;
                 }
                 default: {

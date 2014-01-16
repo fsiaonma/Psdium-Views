@@ -58,7 +58,8 @@ config.projects = [{
                 'src/handlers/quarkJs/ElementsH/InputH.js',
                 'src/handlers/quarkJs/ElementsH/AnimationH.js',
                 'src/handlers/quarkJs/ElementsH/ContainerH.js',
-
+                'src/handlers/quarkJs/ElementsH/DragPanelH.js',
+                
                 'src/handlers/quarkJs/dispatcher.js',
                 'src/handlers/quarkJs/main.js',
                 

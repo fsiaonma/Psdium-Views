@@ -125,7 +125,8 @@ PV.Global = (function() {
                 TOGGLE_BUTTON: "ToggleButton",
                 SWITCH: "Switch",
                 INPUT: "Input",
-                ANIMATION: "Ani"
+                ANIMATION: "Ani",
+                DRAGPANEL: "DragPanel"
             },
 
             BUTTON_STATUS: {
@@ -152,6 +153,10 @@ PV.Global = (function() {
             Input_STATUS: {
                 AREA: "area",
                 TEXT: "text"
+            },
+
+            DRAGPANEL_STATUS: {
+                AREA: "area"
             }
         }
     }
@@ -717,7 +722,7 @@ PVQ.InputH = function() {
                 width = Math.round(area.bounds[2]) - x;
                 height = Math.round(area.bounds[3]) - y;
 
-                parent = this.getParent(layer);
+                parent = this.getParent(area);
                 x -= parent.pos[0];
                 y -= parent.pos[1];
             } else if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
@@ -745,12 +750,12 @@ PVQ.InputH.prototype = new PVQ.BaseH();
 
 /**
  * AnimationH 
- * PSD2V AnimationH 处理方法
+ * PSD2V Animation 处理方法
  * @constructor
  */
 PVQ.AnimationH = function() {
     /**
-     * 修饰 AnimationH 类
+     * 修饰 Animation 类
      * @params {Objcet} fs 要写入的文件
      * @params {Object} aniLayer 当前需要处理的图层
      * @method describe
@@ -829,6 +834,53 @@ PVQ.ContainerH = function() {
 PVQ.ContainerH.prototype = new PVQ.BaseH();
 
 /**
+ * DragPanelH 
+ * PSD2V DragPanel 处理方法
+ * @constructor
+ */
+PVQ.DragPanelH = function() {
+    /**
+     * 修饰 DragPanel 类
+     * @params {Objcet} fs 要写入的文件
+     * @params {Object} dragLayer 当前需要处理的图层
+     * @method describe
+     */
+    this.describe = function(fs, dragLayer) {
+        var parent, x, y, width, height;
+
+        for (var i = 0, len = dragLayer.layers.length; i < len; ++i) {
+            if (dragLayer.layers[i].name == PV.Global.QUARKJS.DRAGPANEL_STATUS.AREA) {
+                var area = dragLayer.layers[i];
+
+                x = Math.round(area.bounds[0]);
+                y = Math.round(area.bounds[1]);
+                width = Math.round(area.bounds[2]) - x;
+                height = Math.round(area.bounds[3]) - y;
+
+                parent = this.getParent(area);
+                x -= parent.pos[0];
+                y -= parent.pos[1];
+            }
+        }
+
+		var name = dragLayer.name;
+        var containerName = name + "Container";
+
+        var str = "\t\tvar " + containerName + " = G.Container.create();\n" + 
+                  "\t\tvar " + name + " = G.DragPanel.create();\n" +
+                  "\t\t" + name + ".setWidth(" + width + ");\n" +
+                  "\t\t" + name + ".setHeight(" + height + ");\n" +
+                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setContent(" + containerName + ");\n" +
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+
+        fs.writeln(str);
+    }
+};
+
+PVQ.DragPanelH.prototype = new PVQ.BaseH();
+
+/**
  * PVQ.dipatcher QuarkJs 元素处理分派器
  * @constructor
  */
@@ -842,6 +894,7 @@ PVQ.dispatcher = (function() {
     var switchH = null;
     var inputH = null;
     var animationH = null;
+    var dragPanelH = null;
            
     // 返回 PVQ.dispatcher 对象
     return {
@@ -939,6 +992,13 @@ PVQ.dispatcher = (function() {
                         animationH = new PVQ.AnimationH();
                     }
                     animationH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.DRAGPANEL: {
+                    if (!dragPanelH) {
+                        dragPanelH = new PVQ.DragPanelH();
+                    }
+                    dragPanelH.describe(fs, layer);
                     break ;
                 }
                 default: {

@@ -26,7 +26,8 @@ PV.Global = (function() {
                 TOGGLE_BUTTON: "ToggleButton",
                 SWITCH: "Switch",
                 INPUT: "Input",
-                ANIMATION: "Ani"
+                ANIMATION: "Ani",
+                DRAGPANEL: "DragPanel"
             },
 
             BUTTON_STATUS: {
@@ -53,6 +54,10 @@ PV.Global = (function() {
             Input_STATUS: {
                 AREA: "area",
                 TEXT: "text"
+            },
+
+            DRAGPANEL_STATUS: {
+                AREA: "area"
             }
         }
     }

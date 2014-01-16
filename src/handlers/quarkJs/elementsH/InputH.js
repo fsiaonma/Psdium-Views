@@ -24,7 +24,7 @@ PVQ.InputH = function() {
                 width = Math.round(area.bounds[2]) - x;
                 height = Math.round(area.bounds[3]) - y;
 
-                parent = this.getParent(layer);
+                parent = this.getParent(area);
                 x -= parent.pos[0];
                 y -= parent.pos[1];
             } else if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {

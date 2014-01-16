@@ -1,11 +1,11 @@
 /**
  * AnimationH 
- * PSD2V AnimationH 处理方法
+ * PSD2V Animation 处理方法
  * @constructor
  */
 PVQ.AnimationH = function() {
     /**
-     * 修饰 AnimationH 类
+     * 修饰 Animation 类
      * @params {Objcet} fs 要写入的文件
      * @params {Object} aniLayer 当前需要处理的图层
      * @method describe
