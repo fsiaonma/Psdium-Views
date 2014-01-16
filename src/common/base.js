@@ -33,7 +33,14 @@ PV.Base = (function() {
          * @method getLastName
          */
         getComponentName: function(name) {
-            return name.substr(name.indexOf("_") + 1);
+            var type = name.substr(0, name.indexOf("_"));
+            var componentName = name;
+            for (var key in PV.Global.QUARKJS.ELEMENT) {
+                if (type == PV.Global.QUARKJS.ELEMENT[key]) {
+                    componentName = name.substr(name.indexOf("_") + 1);
+                }
+            }
+            return componentName;
         }
     }
 })();

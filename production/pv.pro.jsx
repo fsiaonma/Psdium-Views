@@ -67,7 +67,14 @@ PV.Base = (function() {
          * @method getLastName
          */
         getComponentName: function(name) {
-            return name.substr(name.indexOf("_") + 1);
+            var type = name.substr(0, name.indexOf("_"));
+            var componentName = name;
+            for (var key in PV.Global.QUARKJS.ELEMENT) {
+                if (type == PV.Global.QUARKJS.ELEMENT[key]) {
+                    componentName = name.substr(name.indexOf("_") + 1);
+                }
+            }
+            return componentName;
         }
     }
 })();
@@ -288,7 +295,7 @@ PVQ.BaseH = function() {
         var type = parent.name.substr(0, parent.name.indexOf("_"));
 
         if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER || type == PV.Global.QUARKJS.ELEMENT.ITEM) {
-            name = parent.name;
+            name = PV.Base.getComponentName(parent.name);
             pos = [Math.round(parent.bounds[0]), Math.round(parent.bounds[1])];
         } else {
             name = "this";
@@ -311,26 +318,28 @@ PVQ.ImageH = function() {
     /**
      * 修饰 Image 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} imageLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
+    this.describe = function(fs, imageLayer) {
         var self = this;
-        var parent = self.getParent(layer);
+        var parent = self.getParent(imageLayer);
         (function(layer) {
             var callFunc = arguments.callee;
             PV.Base.walk(layer.layers, function(layer, type) {
                 var imageLayer = layer;
                 if (imageLayer.typename == PV.Global.ART_LAYER) {
-                    var name = imageLayer.name;
+                    var name = PV.Base.getComponentName(imageLayer.name);
                     var x = Math.round(imageLayer.bounds[0]);
                     var y = Math.round(imageLayer.bounds[1]);
                     x -= parent.pos[0];
                     y -= parent.pos[1];
                     var width = Math.round(imageLayer.bounds[2]) - x;
                     var height = Math.round(imageLayer.bounds[3]) - y;
+                    var visible = layer.visible? true : false;
 
                     var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
+                              "\t\t" + name + ".setVisible(" + visible + ");\n" +
                               "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                               "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
@@ -340,7 +349,7 @@ PVQ.ImageH = function() {
                     callFunc(imageLayer);
                 }
             });
-        })(layer);
+        })(imageLayer);
     }
 };
 
@@ -355,23 +364,24 @@ PVQ.ButtonH = function() {
     /**
      * 修饰 Button 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} buttonLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var name = layer.name;
-        var x = Math.round(layer.bounds[0]);
-        var y = Math.round(layer.bounds[1]);
-        var parent = this.getParent(layer);
+    this.describe = function(fs, buttonLayer) {
+        var name = PV.Base.getComponentName(buttonLayer.name);
+        var x = Math.round(buttonLayer.bounds[0]);
+        var y = Math.round(buttonLayer.bounds[1]);
+        var parent = this.getParent(buttonLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
-        var width = Math.round(layer.bounds[2]) - x;
-        var height = Math.round(layer.bounds[3]) - y;
+        var width = Math.round(buttonLayer.bounds[2]) - x;
+        var height = Math.round(buttonLayer.bounds[3]) - y;
+        var visible = buttonLayer.visible? true : false;
 
         var up, down, disable;
 
-        for (var i = 0, len = layer.layers.length; i < len; ++i) {
-            var status = layer.layers[i];
+        for (var i = 0, len = buttonLayer.layers.length; i < len; ++i) {
+            var status = buttonLayer.layers[i];
             var type = status.name;
             switch (type) {
                 case PV.Global.QUARKJS.BUTTON_STATUS.UP: {
@@ -423,7 +433,8 @@ PVQ.ButtonH = function() {
         var str = "\t\tvar " + name + " = G.Button.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" + 
+                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
@@ -441,16 +452,16 @@ PVQ.TextH = function() {
     /**
      * 修饰 Text 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} textItemLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var name = layer.name;
+    this.describe = function(fs, textItemLayer) {
+        var name = PV.Base.getComponentName(textItemLayer.name);
 
-        var textLayer = layer.layers[0];
+        var textLayer = textItemLayer.layers[0];
         var x = Math.round(textLayer.bounds[0]);
         var y = Math.round(textLayer.bounds[1]);
-        var parent = this.getParent(layer);
+        var parent = this.getParent(textItemLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
         var width = Math.round(textLayer.bounds[2]) - x;
@@ -458,6 +469,7 @@ PVQ.TextH = function() {
         var fontSize = Math.round(textLayer.textItem.size);
         var lineHeight = Math.round(textLayer.textItem.leading);
         var align =  textLayer.textItem.justification.toString().split(".")[1].toLowerCase();
+        var visible = textLayer.visible? true : false;
 
         var color = textLayer.textItem.color.rgb.hexValue;
         var content = textLayer.textItem.contents.replace(/\r/gi, "");
@@ -470,6 +482,7 @@ PVQ.TextH = function() {
                   "\t\t" + name + ".setColor('#" + color + "');\n" + 
                   "\t\t" + name + ".setTextAlign('" + align + "');\n" + 
                   "\t\t" + name + ".setText('" + content + "');\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
@@ -487,25 +500,24 @@ PVQ.ToggleButtonH = function() {
     /**
      * 修饰 ToggleButton 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} toggleButtonLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var toggleButtonLayer = layer.layers[0];
-
-        var name = toggleButtonLayer.name;
+    this.describe = function(fs, toggleButtonLayer) {
+        var name = PV.Base.getComponentName(toggleButtonLayer.name);
         var x = Math.round(toggleButtonLayer.bounds[0]);
         var y = Math.round(toggleButtonLayer.bounds[1]);
-        var parent = this.getParent(layer);
+        var parent = this.getParent(toggleButtonLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
         var width = Math.round(toggleButtonLayer.bounds[2]) - x;
         var height = Math.round(toggleButtonLayer.bounds[3]) - y;
+        var visible = toggleButtonLayer.visible? true : false;
 
         var up, down, disable, checkup, checkdown, checkdisable;
 
-        for (var i = 0, len = layer.layers.length; i < len; ++i) {
-            var status = layer.layers[i];
+        for (var i = 0, len = toggleButtonLayer.layers.length; i < len; ++i) {
+            var status = toggleButtonLayer.layers[i];
             var type = status.name;
             switch (type) {
                 case PV.Global.QUARKJS.TOGGLE_BUTTON_STATUS.UP: {
@@ -596,6 +608,7 @@ PVQ.ToggleButtonH = function() {
         var str = "\t\tvar " + name + " = G.ToggleButton.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + strs.checkedImgUp + strs.checkedImgDown + strs.checkedImgDisable + "\n" + 
                   "\t\t});\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
@@ -614,23 +627,24 @@ PVQ.SwitchH = function() {
     /**
      * 修饰 Switch 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} switchLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var name = layer.name;
-        var x = Math.round(layer.bounds[0]);
-        var y = Math.round(layer.bounds[1]);
-        var parent = this.getParent(layer);
+    this.describe = function(fs, switchLayer) {
+        var name = PV.Base.getComponentName(switchLayer.name);
+        var x = Math.round(switchLayer.bounds[0]);
+        var y = Math.round(switchLayer.bounds[1]);
+        var parent = this.getParent(switchLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
-        var width = Math.round(layer.bounds[2]) - x;
-        var height = Math.round(layer.bounds[3]) - y;
+        var width = Math.round(switchLayer.bounds[2]) - x;
+        var height = Math.round(switchLayer.bounds[3]) - y;
+        var visible = switchLayer.visible? true : false;
 
         var bg, up, down;
 
-        for (var i = 0, len = layer.layers.length; i < len; ++i) {
-            var status = layer.layers[i];
+        for (var i = 0, len = switchLayer.layers.length; i < len; ++i) {
+            var status = switchLayer.layers[i];
             var type = status.name;
             switch (type) {
                 case PV.Global.QUARKJS.SWITCH_STATUS.BG: {
@@ -683,7 +697,8 @@ PVQ.SwitchH = function() {
                   "\t\t\twidth: " + width + ",\n" + 
                   strs.bg + strs.upBar + strs.downBar + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
+                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
@@ -701,17 +716,17 @@ PVQ.InputH = function() {
     /**
      * 修饰 Input 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} inputLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var parent, x, y, width, height, fontSize, lineHeight;
-        var name = layer.name;
+    this.describe = function(fs, inputLayer) {
+        var parent, x, y, width, height, fontSize, lineHeight, visible;
+        var name = PV.Base.getComponentName(inputLayer.name);
         var containerName = name + "Container";
 
-        for (var i = 0, len = layer.layers.length; i < len; ++i) {
-            if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
-                var area = layer.layers[i];
+        for (var i = 0, len = inputLayer.layers.length; i < len; ++i) {
+            if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
+                var area = inputLayer.layers[i];
                 x = Math.round(area.bounds[0]);
                 y = Math.round(area.bounds[1]);
                 parent = this.getParent(area);
@@ -719,8 +734,9 @@ PVQ.InputH = function() {
                 y -= parent.pos[1];
                 width = Math.round(area.bounds[2]) - x;
                 height = Math.round(area.bounds[3]) - y;
-            } else if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
-                var textItem = layer.layers[i].textItem;
+                visible = inputLayer.visible? true : false;
+            } else if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
+                var textItem = inputLayer.layers[i].textItem;
                 fontSize = Math.round(textItem.size);
                 lineHeight = Math.round(textItem.leading);
             }
@@ -734,6 +750,7 @@ PVQ.InputH = function() {
                   "\t\t" + name + ".setHeight(" + height + ");\n" +
                   "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
                   "\t\t" + name + ".setFontSize(" + fontSize + ");\n" +
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + containerName + ".addChild(" + name + ");\n";
 
         fs.writeln(str);
@@ -768,7 +785,7 @@ PVQ.AnimationH = function() {
 		}
 		actions += "\n\t\t\t]"
 		
-		var name = aniLayer.name;
+		var name = PV.Base.getComponentName(aniLayer.name);
         var x = Math.round(aniLayer.bounds[0]);
         var y = Math.round(aniLayer.bounds[1]);
         var parent = this.getParent(aniLayer);
@@ -776,10 +793,10 @@ PVQ.AnimationH = function() {
         y -= parent.pos[1];
         var width = Math.round(aniLayer.bounds[2]) - x;
         var height = Math.round(aniLayer.bounds[3]) - y;
-
-        
+        var visible = aniLayer.visible? true : false;
 
         var str = "\t\tvar " + name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
@@ -798,22 +815,22 @@ PVQ.ContainerH = function() {
 	/**
      * 修饰 Container 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} containerLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var containerLayer = layer;
-
-        var name = containerLayer.name;
+    this.describe = function(fs, containerLayer) {
+        var name = PV.Base.getComponentName(containerLayer.name);
         var x = Math.round(containerLayer.bounds[0]);
         var y = Math.round(containerLayer.bounds[1]);
-        var parent = this.getParent(layer);
+        var parent = this.getParent(containerLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
         var width = Math.round(containerLayer.bounds[2]) - x;
         var height = Math.round(containerLayer.bounds[3]) - y;
+        var visible = aniLayer.visible? true : false;
 
         var str = "\t\tvar " + name + " = G.Container.create();\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
@@ -840,15 +857,13 @@ PVQ.DragPanelH = function() {
      * @method describe
      */
     this.describe = function(fs, dragLayer) {
-        var parent, x, y, width, height;
+        var parent, x, y, width, height, visible;
         var item;
 
         var self = this;
         PV.Base.walk(dragLayer.layers, function(layer, type) {
-            console.log(layer.name);
             if (layer.name == PV.Global.QUARKJS.DRAGPANEL_STATUS.AREA) {
                 var area = dragLayer.layers[i];
-
                 x = Math.round(area.bounds[0]);
                 y = Math.round(area.bounds[1]);
                 parent = self.getParent(area);
@@ -856,8 +871,9 @@ PVQ.DragPanelH = function() {
                 y -= parent.pos[1];
                 width = Math.round(area.bounds[2]) - x;
                 height = Math.round(area.bounds[3]) - y;
+                visible = dragLayer.visible? true : false;
             } else if (PV.Base.getExName(layer.name) == PV.Global.QUARKJS.ELEMENT.ITEM) {
-                item = layer.name;
+                item = PV.Base.getComponentName(layer.name);
                 var str = "\t\tvar " + item + " = G.Container.create();\n";
                 fs.writeln(str);
                 PV.Base.walk(layer.layers, function(layer, type) {
@@ -866,13 +882,14 @@ PVQ.DragPanelH = function() {
             }
         });
         
-		var name = dragLayer.name;
+		var name = PV.Base.getComponentName(dragLayer.name);
         var containerName = name + "Container";
         
         var str = "\t\tvar " + containerName + " = G.Container.create();\n" + 
                   "\t\tvar " + name + " = G.DragPanel.create();\n" +
                   "\t\t" + name + ".setWidth(" + width + ");\n" +
                   "\t\t" + name + ".setHeight(" + height + ");\n" +
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + name + ".setContent(" + containerName + ");\n" +
                   "\t\t" + parent.name + ".addChild(" + name + ");\n" +
@@ -908,27 +925,31 @@ PVQ.dispatcher = (function() {
          */
         processDoc: function() {
             // 切片文件处理
-            var sliceFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE);
-            var files = File.decode(sliceFolder.getFiles()).split(",");
-            for (var i = 0, len = files.length; i < len; ++i) {
-                var doc = open(File(files[i]));
-                PVQ.processSliceFile(doc);
-                doc.close();
+            if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE) {
+                var sliceFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE);
+                var files = File.decode(sliceFolder.getFiles()).split(",");
+                for (var i = 0, len = files.length; i < len; ++i) {
+                    var doc = open(File(files[i]));
+                    PVQ.processSliceFile(doc);
+                    doc.close();
+                }
             }
-
+            
             // 对位文件处理
-            var posFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS);
-            var files = File.decode(posFolder.getFiles()).split(",");
-            for (var i = 0, len = files.length; i < len; ++i) {
-                var doc = open(File(files[i]));
+            if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS) {
+                var posFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS);
+                var files = File.decode(posFolder.getFiles()).split(",");
+                for (var i = 0, len = files.length; i < len; ++i) {
+                    var doc = open(File(files[i]));
 
-                PV.Base.walk(doc.layers, function(layer, type) {
-                    if (type == PV.Global.QUARKJS.VIEW) {
-                        PVQ.processPosFile(layer);
-                    }
-                });
+                    PV.Base.walk(doc.layers, function(layer, type) {
+                        if (type == PV.Global.QUARKJS.VIEW) {
+                            PVQ.processPosFile(layer);
+                        }
+                    });
 
-                doc.close();
+                    doc.close();
+                }
             }
         },
 

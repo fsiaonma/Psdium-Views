@@ -7,23 +7,24 @@ PVQ.SwitchH = function() {
     /**
      * 修饰 Switch 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} switchLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var name = layer.name;
-        var x = Math.round(layer.bounds[0]);
-        var y = Math.round(layer.bounds[1]);
-        var parent = this.getParent(layer);
+    this.describe = function(fs, switchLayer) {
+        var name = PV.Base.getComponentName(switchLayer.name);
+        var x = Math.round(switchLayer.bounds[0]);
+        var y = Math.round(switchLayer.bounds[1]);
+        var parent = this.getParent(switchLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
-        var width = Math.round(layer.bounds[2]) - x;
-        var height = Math.round(layer.bounds[3]) - y;
+        var width = Math.round(switchLayer.bounds[2]) - x;
+        var height = Math.round(switchLayer.bounds[3]) - y;
+        var visible = switchLayer.visible? true : false;
 
         var bg, up, down;
 
-        for (var i = 0, len = layer.layers.length; i < len; ++i) {
-            var status = layer.layers[i];
+        for (var i = 0, len = switchLayer.layers.length; i < len; ++i) {
+            var status = switchLayer.layers[i];
             var type = status.name;
             switch (type) {
                 case PV.Global.QUARKJS.SWITCH_STATUS.BG: {
@@ -76,7 +77,8 @@ PVQ.SwitchH = function() {
                   "\t\t\twidth: " + width + ",\n" + 
                   strs.bg + strs.upBar + strs.downBar + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
+                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
         fs.writeln(str);

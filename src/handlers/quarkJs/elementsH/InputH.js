@@ -7,17 +7,17 @@ PVQ.InputH = function() {
     /**
      * 修饰 Input 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} inputLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var parent, x, y, width, height, fontSize, lineHeight;
-        var name = layer.name;
+    this.describe = function(fs, inputLayer) {
+        var parent, x, y, width, height, fontSize, lineHeight, visible;
+        var name = PV.Base.getComponentName(inputLayer.name);
         var containerName = name + "Container";
 
-        for (var i = 0, len = layer.layers.length; i < len; ++i) {
-            if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
-                var area = layer.layers[i];
+        for (var i = 0, len = inputLayer.layers.length; i < len; ++i) {
+            if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
+                var area = inputLayer.layers[i];
                 x = Math.round(area.bounds[0]);
                 y = Math.round(area.bounds[1]);
                 parent = this.getParent(area);
@@ -25,8 +25,9 @@ PVQ.InputH = function() {
                 y -= parent.pos[1];
                 width = Math.round(area.bounds[2]) - x;
                 height = Math.round(area.bounds[3]) - y;
-            } else if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
-                var textItem = layer.layers[i].textItem;
+                visible = inputLayer.visible? true : false;
+            } else if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
+                var textItem = inputLayer.layers[i].textItem;
                 fontSize = Math.round(textItem.size);
                 lineHeight = Math.round(textItem.leading);
             }
@@ -40,6 +41,7 @@ PVQ.InputH = function() {
                   "\t\t" + name + ".setHeight(" + height + ");\n" +
                   "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
                   "\t\t" + name + ".setFontSize(" + fontSize + ");\n" +
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + containerName + ".addChild(" + name + ");\n";
 
         fs.writeln(str);

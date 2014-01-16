@@ -24,7 +24,7 @@ PVQ.AnimationH = function() {
 		}
 		actions += "\n\t\t\t]"
 		
-		var name = aniLayer.name;
+		var name = PV.Base.getComponentName(aniLayer.name);
         var x = Math.round(aniLayer.bounds[0]);
         var y = Math.round(aniLayer.bounds[1]);
         var parent = this.getParent(aniLayer);
@@ -32,8 +32,10 @@ PVQ.AnimationH = function() {
         y -= parent.pos[1];
         var width = Math.round(aniLayer.bounds[2]) - x;
         var height = Math.round(aniLayer.bounds[3]) - y;
+        var visible = aniLayer.visible? true : false;
 
         var str = "\t\tvar " + name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 

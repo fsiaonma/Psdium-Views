@@ -7,25 +7,24 @@ PVQ.ToggleButtonH = function() {
     /**
      * 修饰 ToggleButton 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} toggleButtonLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, layer) {
-        var toggleButtonLayer = layer.layers[0];
-
-        var name = toggleButtonLayer.name;
+    this.describe = function(fs, toggleButtonLayer) {
+        var name = PV.Base.getComponentName(toggleButtonLayer.name);
         var x = Math.round(toggleButtonLayer.bounds[0]);
         var y = Math.round(toggleButtonLayer.bounds[1]);
-        var parent = this.getParent(layer);
+        var parent = this.getParent(toggleButtonLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
         var width = Math.round(toggleButtonLayer.bounds[2]) - x;
         var height = Math.round(toggleButtonLayer.bounds[3]) - y;
+        var visible = toggleButtonLayer.visible? true : false;
 
         var up, down, disable, checkup, checkdown, checkdisable;
 
-        for (var i = 0, len = layer.layers.length; i < len; ++i) {
-            var status = layer.layers[i];
+        for (var i = 0, len = toggleButtonLayer.layers.length; i < len; ++i) {
+            var status = toggleButtonLayer.layers[i];
             var type = status.name;
             switch (type) {
                 case PV.Global.QUARKJS.TOGGLE_BUTTON_STATUS.UP: {
@@ -116,6 +115,7 @@ PVQ.ToggleButtonH = function() {
         var str = "\t\tvar " + name + " = G.ToggleButton.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + strs.checkedImgUp + strs.checkedImgDown + strs.checkedImgDisable + "\n" + 
                   "\t\t});\n" + 
+                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + parent.name + ".addChild(" + name + ");\n";
 
