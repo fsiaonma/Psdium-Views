@@ -16,12 +16,11 @@ PVQ.ToggleButtonH = function() {
         var name = toggleButtonLayer.name;
         var x = Math.round(toggleButtonLayer.bounds[0]);
         var y = Math.round(toggleButtonLayer.bounds[1]);
-        var width = Math.round(toggleButtonLayer.bounds[2]) - x;
-        var height = Math.round(toggleButtonLayer.bounds[3]) - y;
-
         var parent = this.getParent(layer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(toggleButtonLayer.bounds[2]) - x;
+        var height = Math.round(toggleButtonLayer.bounds[3]) - y;
 
         var up, down, disable, checkup, checkdown, checkdisable;
 

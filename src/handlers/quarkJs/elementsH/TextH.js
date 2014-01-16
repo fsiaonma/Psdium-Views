@@ -16,6 +16,9 @@ PVQ.TextH = function() {
         var textLayer = layer.layers[0];
         var x = Math.round(textLayer.bounds[0]);
         var y = Math.round(textLayer.bounds[1]);
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
         var width = Math.round(textLayer.bounds[2]) - x;
         var height = Math.round(textLayer.bounds[3]) - y;
         var fontSize = Math.round(textLayer.textItem.size);
@@ -24,10 +27,6 @@ PVQ.TextH = function() {
 
         var color = textLayer.textItem.color.rgb.hexValue;
         var content = textLayer.textItem.contents.replace(/\r/gi, "");
-
-        var parent = this.getParent(layer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
 
         var str = "\t\tvar " + name + " = G.Text.create();\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 

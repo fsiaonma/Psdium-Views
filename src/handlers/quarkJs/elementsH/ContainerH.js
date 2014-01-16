@@ -16,12 +16,11 @@ PVQ.ContainerH = function() {
         var name = containerLayer.name;
         var x = Math.round(containerLayer.bounds[0]);
         var y = Math.round(containerLayer.bounds[1]);
-        var width = Math.round(containerLayer.bounds[2]) - x;
-        var height = Math.round(containerLayer.bounds[3]) - y;
-
         var parent = this.getParent(layer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(containerLayer.bounds[2]) - x;
+        var height = Math.round(containerLayer.bounds[3]) - y;
 
         var str = "\t\tvar " + name + " = G.Container.create();\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 

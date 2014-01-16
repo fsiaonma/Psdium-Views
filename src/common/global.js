@@ -27,7 +27,8 @@ PV.Global = (function() {
                 SWITCH: "Switch",
                 INPUT: "Input",
                 ANIMATION: "Ani",
-                DRAGPANEL: "DragPanel"
+                DRAGPANEL: "DragPanel",
+                ITEM: "Item"
             },
 
             BUTTON_STATUS: {

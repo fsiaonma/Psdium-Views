@@ -27,12 +27,11 @@ PVQ.AnimationH = function() {
 		var name = aniLayer.name;
         var x = Math.round(aniLayer.bounds[0]);
         var y = Math.round(aniLayer.bounds[1]);
-        var width = Math.round(aniLayer.bounds[2]) - x;
-        var height = Math.round(aniLayer.bounds[3]) - y;
-
         var parent = this.getParent(aniLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(aniLayer.bounds[2]) - x;
+        var height = Math.round(aniLayer.bounds[3]) - y;
 
         var str = "\t\tvar " + name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 

@@ -18,15 +18,13 @@ PVQ.InputH = function() {
         for (var i = 0, len = layer.layers.length; i < len; ++i) {
             if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
                 var area = layer.layers[i];
-
                 x = Math.round(area.bounds[0]);
                 y = Math.round(area.bounds[1]);
-                width = Math.round(area.bounds[2]) - x;
-                height = Math.round(area.bounds[3]) - y;
-
                 parent = this.getParent(area);
                 x -= parent.pos[0];
                 y -= parent.pos[1];
+                width = Math.round(area.bounds[2]) - x;
+                height = Math.round(area.bounds[3]) - y;
             } else if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
                 var textItem = layer.layers[i].textItem;
                 fontSize = Math.round(textItem.size);

@@ -14,12 +14,11 @@ PVQ.SwitchH = function() {
         var name = layer.name;
         var x = Math.round(layer.bounds[0]);
         var y = Math.round(layer.bounds[1]);
-        var width = Math.round(layer.bounds[2]) - x;
-        var height = Math.round(layer.bounds[3]) - y;
-
         var parent = this.getParent(layer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
 
         var bg, up, down;
 

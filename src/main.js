@@ -5,7 +5,10 @@
  */
 (function(app) {
 	// 转换长度单位为像素
-	preferences.rulerUnits = Units.PIXELS;
+	app.preferences.rulerUnits = Units.PIXELS;
+
+    // 转换字体单位为像素
+    app.preferences.typeUnits = TypeUnits.PIXELS;
 	
 	// 禁止弹出框
 	displayDialogs =DialogModes.NO;

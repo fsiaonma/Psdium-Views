@@ -15,7 +15,7 @@ PVQ.BaseH = function() {
         var parent = layer.parent;
         var type = parent.name.substr(0, parent.name.indexOf("_"));
 
-        if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER) {
+        if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER || type == PV.Global.QUARKJS.ELEMENT.ITEM) {
             name = parent.name;
             pos = [Math.round(parent.bounds[0]), Math.round(parent.bounds[1])];
         } else {

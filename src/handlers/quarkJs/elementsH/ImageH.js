@@ -12,6 +12,7 @@ PVQ.ImageH = function() {
      */
     this.describe = function(fs, layer) {
         var self = this;
+        var parent = self.getParent(layer);
         (function(layer) {
             var callFunc = arguments.callee;
             PV.Base.walk(layer.layers, function(layer, type) {
@@ -20,12 +21,10 @@ PVQ.ImageH = function() {
                     var name = imageLayer.name;
                     var x = Math.round(imageLayer.bounds[0]);
                     var y = Math.round(imageLayer.bounds[1]);
-                    var width = Math.round(imageLayer.bounds[2]) - x;
-                    var height = Math.round(imageLayer.bounds[3]) - y;
-
-                    var parent = self.getParent(layer);
                     x -= parent.pos[0];
                     y -= parent.pos[1];
+                    var width = Math.round(imageLayer.bounds[2]) - x;
+                    var height = Math.round(imageLayer.bounds[3]) - y;
 
                     var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
                               "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 

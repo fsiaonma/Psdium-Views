@@ -126,7 +126,8 @@ PV.Global = (function() {
                 SWITCH: "Switch",
                 INPUT: "Input",
                 ANIMATION: "Ani",
-                DRAGPANEL: "DragPanel"
+                DRAGPANEL: "DragPanel",
+                ITEM: "Item"
             },
 
             BUTTON_STATUS: {
@@ -286,7 +287,7 @@ PVQ.BaseH = function() {
         var parent = layer.parent;
         var type = parent.name.substr(0, parent.name.indexOf("_"));
 
-        if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER) {
+        if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER || type == PV.Global.QUARKJS.ELEMENT.ITEM) {
             name = parent.name;
             pos = [Math.round(parent.bounds[0]), Math.round(parent.bounds[1])];
         } else {
@@ -315,6 +316,7 @@ PVQ.ImageH = function() {
      */
     this.describe = function(fs, layer) {
         var self = this;
+        var parent = self.getParent(layer);
         (function(layer) {
             var callFunc = arguments.callee;
             PV.Base.walk(layer.layers, function(layer, type) {
@@ -323,12 +325,10 @@ PVQ.ImageH = function() {
                     var name = imageLayer.name;
                     var x = Math.round(imageLayer.bounds[0]);
                     var y = Math.round(imageLayer.bounds[1]);
-                    var width = Math.round(imageLayer.bounds[2]) - x;
-                    var height = Math.round(imageLayer.bounds[3]) - y;
-
-                    var parent = self.getParent(layer);
                     x -= parent.pos[0];
                     y -= parent.pos[1];
+                    var width = Math.round(imageLayer.bounds[2]) - x;
+                    var height = Math.round(imageLayer.bounds[3]) - y;
 
                     var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
                               "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
@@ -362,12 +362,11 @@ PVQ.ButtonH = function() {
         var name = layer.name;
         var x = Math.round(layer.bounds[0]);
         var y = Math.round(layer.bounds[1]);
-        var width = Math.round(layer.bounds[2]) - x;
-        var height = Math.round(layer.bounds[3]) - y;
-
         var parent = this.getParent(layer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
 
         var up, down, disable;
 
@@ -451,6 +450,9 @@ PVQ.TextH = function() {
         var textLayer = layer.layers[0];
         var x = Math.round(textLayer.bounds[0]);
         var y = Math.round(textLayer.bounds[1]);
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
         var width = Math.round(textLayer.bounds[2]) - x;
         var height = Math.round(textLayer.bounds[3]) - y;
         var fontSize = Math.round(textLayer.textItem.size);
@@ -459,10 +461,6 @@ PVQ.TextH = function() {
 
         var color = textLayer.textItem.color.rgb.hexValue;
         var content = textLayer.textItem.contents.replace(/\r/gi, "");
-
-        var parent = this.getParent(layer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
 
         var str = "\t\tvar " + name + " = G.Text.create();\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
@@ -498,12 +496,11 @@ PVQ.ToggleButtonH = function() {
         var name = toggleButtonLayer.name;
         var x = Math.round(toggleButtonLayer.bounds[0]);
         var y = Math.round(toggleButtonLayer.bounds[1]);
-        var width = Math.round(toggleButtonLayer.bounds[2]) - x;
-        var height = Math.round(toggleButtonLayer.bounds[3]) - y;
-
         var parent = this.getParent(layer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(toggleButtonLayer.bounds[2]) - x;
+        var height = Math.round(toggleButtonLayer.bounds[3]) - y;
 
         var up, down, disable, checkup, checkdown, checkdisable;
 
@@ -624,12 +621,11 @@ PVQ.SwitchH = function() {
         var name = layer.name;
         var x = Math.round(layer.bounds[0]);
         var y = Math.round(layer.bounds[1]);
-        var width = Math.round(layer.bounds[2]) - x;
-        var height = Math.round(layer.bounds[3]) - y;
-
         var parent = this.getParent(layer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
 
         var bg, up, down;
 
@@ -716,15 +712,13 @@ PVQ.InputH = function() {
         for (var i = 0, len = layer.layers.length; i < len; ++i) {
             if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
                 var area = layer.layers[i];
-
                 x = Math.round(area.bounds[0]);
                 y = Math.round(area.bounds[1]);
-                width = Math.round(area.bounds[2]) - x;
-                height = Math.round(area.bounds[3]) - y;
-
                 parent = this.getParent(area);
                 x -= parent.pos[0];
                 y -= parent.pos[1];
+                width = Math.round(area.bounds[2]) - x;
+                height = Math.round(area.bounds[3]) - y;
             } else if (layer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
                 var textItem = layer.layers[i].textItem;
                 fontSize = Math.round(textItem.size);
@@ -777,12 +771,13 @@ PVQ.AnimationH = function() {
 		var name = aniLayer.name;
         var x = Math.round(aniLayer.bounds[0]);
         var y = Math.round(aniLayer.bounds[1]);
-        var width = Math.round(aniLayer.bounds[2]) - x;
-        var height = Math.round(aniLayer.bounds[3]) - y;
-
         var parent = this.getParent(aniLayer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(aniLayer.bounds[2]) - x;
+        var height = Math.round(aniLayer.bounds[3]) - y;
+
+        
 
         var str = "\t\tvar " + name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
@@ -812,12 +807,11 @@ PVQ.ContainerH = function() {
         var name = containerLayer.name;
         var x = Math.round(containerLayer.bounds[0]);
         var y = Math.round(containerLayer.bounds[1]);
-        var width = Math.round(containerLayer.bounds[2]) - x;
-        var height = Math.round(containerLayer.bounds[3]) - y;
-
         var parent = this.getParent(layer);
         x -= parent.pos[0];
         y -= parent.pos[1];
+        var width = Math.round(containerLayer.bounds[2]) - x;
+        var height = Math.round(containerLayer.bounds[3]) - y;
 
         var str = "\t\tvar " + name + " = G.Container.create();\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
@@ -847,32 +841,42 @@ PVQ.DragPanelH = function() {
      */
     this.describe = function(fs, dragLayer) {
         var parent, x, y, width, height;
+        var item;
 
-        for (var i = 0, len = dragLayer.layers.length; i < len; ++i) {
-            if (dragLayer.layers[i].name == PV.Global.QUARKJS.DRAGPANEL_STATUS.AREA) {
+        var self = this;
+        PV.Base.walk(dragLayer.layers, function(layer, type) {
+            console.log(layer.name);
+            if (layer.name == PV.Global.QUARKJS.DRAGPANEL_STATUS.AREA) {
                 var area = dragLayer.layers[i];
 
                 x = Math.round(area.bounds[0]);
                 y = Math.round(area.bounds[1]);
-                width = Math.round(area.bounds[2]) - x;
-                height = Math.round(area.bounds[3]) - y;
-
-                parent = this.getParent(area);
+                parent = self.getParent(area);
                 x -= parent.pos[0];
                 y -= parent.pos[1];
+                width = Math.round(area.bounds[2]) - x;
+                height = Math.round(area.bounds[3]) - y;
+            } else if (PV.Base.getExName(layer.name) == PV.Global.QUARKJS.ELEMENT.ITEM) {
+                item = layer.name;
+                var str = "\t\tvar " + item + " = G.Container.create();\n";
+                fs.writeln(str);
+                PV.Base.walk(layer.layers, function(layer, type) {
+                    PVQ.dispatcher.processElements(fs, layer, type);
+                });
             }
-        }
-
+        });
+        
 		var name = dragLayer.name;
         var containerName = name + "Container";
-
+        
         var str = "\t\tvar " + containerName + " = G.Container.create();\n" + 
                   "\t\tvar " + name + " = G.DragPanel.create();\n" +
                   "\t\t" + name + ".setWidth(" + width + ");\n" +
                   "\t\t" + name + ".setHeight(" + height + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + name + ".setContent(" + containerName + ");\n" +
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" +
+                  "\t\t" + containerName + ".addChild(" + item + ");\n";
 
         fs.writeln(str);
     }
@@ -1055,7 +1059,10 @@ PV.dispatcher = (function() {
  */
 (function(app) {
 	// 转换长度单位为像素
-	preferences.rulerUnits = Units.PIXELS;
+	app.preferences.rulerUnits = Units.PIXELS;
+
+    // 转换字体单位为像素
+    app.preferences.typeUnits = TypeUnits.PIXELS;
 	
 	// 禁止弹出框
 	displayDialogs =DialogModes.NO;
