@@ -7,7 +7,11 @@ PVQ.dispatcher = (function() {
     var imageH = null;
     var buttonH = null;
     var textH = null;
-    var containerH = null; 
+    var containerH = null;
+    var toggleButtonH = null;
+    var switchH = null;
+    var inputH = null;
+    var animationH = null;
            
     // 返回 PVQ.dispatcher 对象
     return {
@@ -25,12 +29,18 @@ PVQ.dispatcher = (function() {
                 doc.close();
             }
 
-            // 对文文件处理
+            // 对位文件处理
             var posFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS);
             var files = File.decode(posFolder.getFiles()).split(",");
             for (var i = 0, len = files.length; i < len; ++i) {
                 var doc = open(File(files[i]));
-                PVQ.processPosFile(doc);
+
+                PV.Base.walk(doc.layers, function(layer, type) {
+                    if (type == PV.Global.QUARKJS.VIEW) {
+                        PVQ.processPosFile(layer);
+                    }
+                });
+
                 doc.close();
             }
         },
@@ -71,6 +81,34 @@ PVQ.dispatcher = (function() {
                         containerH = new PVQ.ContainerH();
                     }
                     containerH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.TOGGLE_BUTTON: {
+                    if (!toggleButtonH) {
+                        toggleButtonH = new PVQ.ToggleButtonH();
+                    }
+                    toggleButtonH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.SWITCH: {
+                    if (!switchH) {
+                        switchH = new PVQ.SwitchH();
+                    }
+                    switchH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.INPUT: {
+                    if (!inputH) {
+                        inputH = new PVQ.InputH();
+                    }
+                    inputH.describe(fs, layer);
+                    break ;
+                }
+                case PV.Global.QUARKJS.ELEMENT.ANIMATION: {
+                    if (!animationH) {
+                        animationH = new PVQ.AnimationH();
+                    }
+                    animationH.describe(fs, layer);
                     break ;
                 }
                 default: {

@@ -17,6 +17,10 @@ PVQ.ButtonH = function() {
         var width = Math.round(layer.bounds[2]) - x;
         var height = Math.round(layer.bounds[3]) - y;
 
+        var parent = this.getParent(layer);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
+
         var up, down, disable;
 
         for (var i = 0, len = layer.layers.length; i < len; ++i) {
@@ -68,10 +72,6 @@ PVQ.ButtonH = function() {
             strs.imgDisable = disable? "\t\t\t,imgDisable: G.getSlice('" + disable + "')\n" : '';
             current = "imgDisable";
         }
-
-        var parent = this.getParent(layer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
        
         var str = "\t\tvar " + name + " = G.Button.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + "\n" + 

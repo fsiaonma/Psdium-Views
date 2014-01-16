@@ -1,11 +1,13 @@
 /**
  * Psdium-Views quarkJs 对位文件处理方法
- * @params {Objcet} doc 当前文本对象
+ * @params {Objcet} layer 当前视图对象
  * @method processPosFile
  */
 PVQ.processPosFile = (function() {
-    return function(doc) {
-        var vName = doc.name.substr(0, doc.name.indexOf(".")) + "V";
+    return function(layer) {
+
+        var start = layer.name.indexOf("_") + 1;
+        var vName = layer.name.substr(start) + "V";
 
         var fs = new File(PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.POS + vName + ".js");
         fs.encoding = "utf-8";
@@ -18,7 +20,7 @@ PVQ.processPosFile = (function() {
             "\t\tthis._super(arguments);\n"
         );
 
-        PV.Base.walk(doc.layers, function(layer, type) {
+        PV.Base.walk(layer.layers, function(layer, type) {
             PVQ.dispatcher.processElements(fs, layer, type);
         });
         

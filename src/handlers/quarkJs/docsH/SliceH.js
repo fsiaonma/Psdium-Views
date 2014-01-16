@@ -13,15 +13,15 @@ PVQ.processSliceFile = (function() {
         var fs = File(PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.SLICE + "Slice.js");
 
         if (fs.exists) {
+            fs.encoding = "utf-8";
             fs.open("e:");
             fs.seek(0, 2);
         } else {
             fs = new File(PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.SLICE + "Slice.js");
+            fs.encoding = "utf-8";
             fs.open("e:");
             fs.writeln("Slice = window.Slice || {};");
         }
-
-        fs.encoding = "utf-8";
         
         fs.writeln("");
 
@@ -29,21 +29,27 @@ PVQ.processSliceFile = (function() {
 
         var name = doc.name.substr(0, doc.name.indexOf("."));
         fs.writeln("Slice['" + name + ".png'] = {");
-        for (var i = 0, len = doc.layers.length; i < len; ++i) {
-            var layer = doc.layers[i];
-            if (str != "") {
-                fs.write(",\n");
+
+        (function(layers) {
+            for (var i = 0, len = layers.length; i < len; ++i) {
+                var layer = layers[i];
+                if (layer.typename == PV.Global.ART_LAYER) {
+                    if (str != "") {
+                        fs.write(",\n");
+                    }
+                    var name = layer.name;
+                    var x = Math.round(layer.bounds[0]);
+                    var y = Math.round(layer.bounds[1]);
+                    var width = Math.round(layer.bounds[2]) - x;
+                    var height = Math.round(layer.bounds[3]) - y;
+                    str = "\t'" + name + "':[" + x + ", " + y + ", " + width + ", " + height + "]";
+                    fs.write(str);
+                } else if (layer.typename == PV.Global.LAYER_SET) {
+                    arguments.callee(layer.layers);
+                }
             }
+        })(doc.layers);
 
-            var name = layer.name;
-            var x = Math.round(layer.bounds[0]);
-            var y = Math.round(layer.bounds[1]);
-            var width = Math.round(layer.bounds[2]) - x;
-            var height = Math.round(layer.bounds[3]) - y;
-
-            str = "\t'" + name + "':[" + x + ", " + y + ", " + width + ", " + height + "]";
-            fs.write(str);
-        }
         fs.writeln("\n};");
 
         fs.close();

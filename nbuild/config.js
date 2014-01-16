@@ -53,7 +53,12 @@ config.projects = [{
                 'src/handlers/quarkJs/ElementsH/ImageH.js',
                 'src/handlers/quarkJs/ElementsH/ButtonH.js',
                 'src/handlers/quarkJs/ElementsH/TextH.js',
+                'src/handlers/quarkJs/ElementsH/ToggleButtonH.js',
+                'src/handlers/quarkJs/ElementsH/SwitchH.js',
+                'src/handlers/quarkJs/ElementsH/InputH.js',
+                'src/handlers/quarkJs/ElementsH/AnimationH.js',
                 'src/handlers/quarkJs/ElementsH/ContainerH.js',
+
                 'src/handlers/quarkJs/dispatcher.js',
                 'src/handlers/quarkJs/main.js',
                 

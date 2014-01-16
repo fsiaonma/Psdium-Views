@@ -16,17 +16,43 @@ PV.Global = (function() {
 
         // QuarkJS 元素
         QUARKJS: {
+            VIEW: "View",
+
             ELEMENT: {
                 IMAGE: "Image",
                 BUTTON: "Button",
                 TEXT: "Text",
-                CONTAINER: "Container"
+                CONTAINER: "Container",
+                TOGGLE_BUTTON: "ToggleButton",
+                SWITCH: "Switch",
+                INPUT: "Input",
+                ANIMATION: "Ani"
             },
 
             BUTTON_STATUS: {
                 UP: "up",
                 DOWN: "down",
                 DISABLE: "disable"
+            },
+
+            TOGGLE_BUTTON_STATUS: {
+                UP: "up",
+                DOWN: "down",
+                DISABLE: "disable",
+                CHECK_UP: "checkup",
+                CHECK_DOWN: "checkdown",
+                CHECK_DISABLE: "checkdisable"
+            },
+
+            SWITCH_STATUS: {
+                BG: "bg",
+                UP: "up",
+                DOWN: "down"
+            },
+
+            Input_STATUS: {
+                AREA: "area",
+                TEXT: "text"
             }
         }
     }
