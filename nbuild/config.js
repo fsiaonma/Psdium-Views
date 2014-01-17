@@ -33,8 +33,36 @@ config.projects = [{
     },
     js: {                   // javascript 压缩打包配置项
         compression: [{         // javascript 压缩配置项。（数组中可配置多个对象）
-            dir: [],                // 需要压缩的 js 文件路径，相对于 rootPath。（必填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）
-            outputFile: ''          // 压缩合并后的 js 文件名。 （选填。默认为 min.js）
+            dir: [
+                'src/libs/console.js',
+
+                'src/pv.js',
+
+                'src/common/base.js',
+                'src/common/config.js',
+                'src/common/global.js',
+
+                'src/handlers/quarkJs/DocsH/SliceH.js',
+                'src/handlers/quarkJs/DocsH/PosH.js',
+
+                'src/handlers/quarkJs/ElementsH/BaseH.js',
+                'src/handlers/quarkJs/ElementsH/ImageH.js',
+                'src/handlers/quarkJs/ElementsH/ButtonH.js',
+                'src/handlers/quarkJs/ElementsH/TextH.js',
+                'src/handlers/quarkJs/ElementsH/ToggleButtonH.js',
+                'src/handlers/quarkJs/ElementsH/SwitchH.js',
+                'src/handlers/quarkJs/ElementsH/InputH.js',
+                'src/handlers/quarkJs/ElementsH/AnimationH.js',
+                'src/handlers/quarkJs/ElementsH/ContainerH.js',
+                'src/handlers/quarkJs/ElementsH/DragPanelH.js',
+                
+                'src/handlers/quarkJs/dispatcher.js',
+                'src/handlers/quarkJs/main.js',
+                
+                'src/dispatcher.js',
+                'src/main.js'
+            ],                // 需要压缩的 js 文件路径，相对于 rootPath。（必填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）
+            outputFile: 'PsdiumViews-min.jsx'          // 压缩合并后的 js 文件名。 （选填。默认为 min.js）
         }],
         merge: [{               // javascript 合并配置项。（数组中可配置多个对象）
             dir: [
@@ -66,7 +94,7 @@ config.projects = [{
                 'src/dispatcher.js',
                 'src/main.js'
             ],                // 需要合并的 js 文件路径，相对于 rootPath。（必填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）
-            outputFile: 'pv.pro.jsx'          // 合并后的 js 文件名。 （选填。默认为 merge.js）
+            outputFile: 'PsdiumViews.jsx'          // 合并后的 js 文件名。 （选填。默认为 merge.js）
         }],
         copyOnly: [],           // 需要复制的 js 文件路径，相对于 rootPath。（选填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）
         ignore: []              // 不用打包的 js 文件路径，相对于 rootPath。（选填。接受文件路径或文件夹路径，若配置文件夹路径必须以 '/' 结尾）

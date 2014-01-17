@@ -11,8 +11,10 @@ PVQ.AnimationH = function() {
      * @method describe
      */
     this.describe = function(fs, aniLayer) {
-		var animations = aniLayer.layers;
+        var parent = this.getParent(aniLayer);
+        var config = this.getConfig(aniLayer, parent);
 
+		var animations = aniLayer.layers;
 		var tmpStr = "";
 		var actions = "[";
 		for (var i = 0, len = animations.length; i < len; ++i) {
@@ -24,21 +26,11 @@ PVQ.AnimationH = function() {
 		}
 		actions += "\n\t\t\t]"
 		
-		var name = PV.Base.getComponentName(aniLayer.name);
-        var x = Math.round(aniLayer.bounds[0]);
-        var y = Math.round(aniLayer.bounds[1]);
-        var parent = this.getParent(aniLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(aniLayer.bounds[2]) - x;
-        var height = Math.round(aniLayer.bounds[3]) - y;
-        var visible = aniLayer.visible? true : false;
-
-        var str = "\t\tvar " + name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" +
-                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+        var str = "\t\tvar " + config.name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" + 
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" + 
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" +
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
     }

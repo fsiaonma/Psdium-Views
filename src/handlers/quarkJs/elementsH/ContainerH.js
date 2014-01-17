@@ -11,21 +11,14 @@ PVQ.ContainerH = function() {
      * @method describe
      */
     this.describe = function(fs, containerLayer) {
-        var name = PV.Base.getComponentName(containerLayer.name);
-        var x = Math.round(containerLayer.bounds[0]);
-        var y = Math.round(containerLayer.bounds[1]);
         var parent = this.getParent(containerLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(containerLayer.bounds[2]) - x;
-        var height = Math.round(containerLayer.bounds[3]) - y;
-        var visible = aniLayer.visible? true : false;
+        var config = this.getConfig(containerLayer, parent);
 
-        var str = "\t\tvar " + name + " = G.Container.create();\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+        var str = "\t\tvar " + config.name + " = G.Container.create();\n" + 
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" +
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" + 
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
 

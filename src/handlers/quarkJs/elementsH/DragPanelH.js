@@ -11,21 +11,15 @@ PVQ.DragPanelH = function() {
      * @method describe
      */
     this.describe = function(fs, dragLayer) {
-        var parent, x, y, width, height, visible;
+        var config, parent;
         var item;
 
         var self = this;
         PV.Base.walk(dragLayer.layers, function(layer, type) {
             if (layer.name == PV.Global.QUARKJS.DRAGPANEL_STATUS.AREA) {
                 var area = dragLayer.layers[i];
-                x = Math.round(area.bounds[0]);
-                y = Math.round(area.bounds[1]);
                 parent = self.getParent(area);
-                x -= parent.pos[0];
-                y -= parent.pos[1];
-                width = Math.round(area.bounds[2]) - x;
-                height = Math.round(area.bounds[3]) - y;
-                visible = dragLayer.visible? true : false;
+                config = self.getConfig(area, parent);
             } else if (PV.Base.getExName(layer.name) == PV.Global.QUARKJS.ELEMENT.ITEM) {
                 item = PV.Base.getComponentName(layer.name);
                 var str = "\t\tvar " + item + " = G.Container.create();\n";
@@ -36,15 +30,15 @@ PVQ.DragPanelH = function() {
             }
         });
         
-		var name = PV.Base.getComponentName(dragLayer.name);
+		    var name = PV.Base.getComponentName(dragLayer.name);
         var containerName = name + "Container";
         
         var str = "\t\tvar " + containerName + " = G.Container.create();\n" + 
                   "\t\tvar " + name + " = G.DragPanel.create();\n" +
-                  "\t\t" + name + ".setWidth(" + width + ");\n" +
-                  "\t\t" + name + ".setHeight(" + height + ");\n" +
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setWidth(" + config.pos[2] + ");\n" +
+                  "\t\t" + name + ".setHeight(" + config.pos[3] + ");\n" +
+                  "\t\t" + name + ".setVisible(" + config.visible + ");\n" +
+                  "\t\t" + name + ".setPos([" + config.pos + "]);\n" + 
                   "\t\t" + name + ".setContent(" + containerName + ");\n" +
                   "\t\t" + parent.name + ".addChild(" + name + ");\n" +
                   "\t\t" + containerName + ".addChild(" + item + ");\n" + 

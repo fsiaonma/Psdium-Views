@@ -27,5 +27,28 @@ PVQ.BaseH = function() {
             pos: pos,
             name: name 
         }
+    },
+
+    /**
+     * 获取当前图层常用配置
+     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} parent 当前需要处理的图层的父图层
+     * @method getConfig
+     */
+    this.getConfig = function(layer, parent) {
+        var name = PV.Base.getComponentName(layer.name);
+        var x = Math.round(layer.bounds[0]);
+        var y = Math.round(layer.bounds[1]);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
+        var visible = layer.visible? true : false;
+
+        return {
+            name: name,
+            pos: [x, y, width, height],
+            visible: visible
+        }
     }
 };

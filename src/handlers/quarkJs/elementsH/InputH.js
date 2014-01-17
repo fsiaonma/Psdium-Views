@@ -11,21 +11,13 @@ PVQ.InputH = function() {
      * @method describe
      */
     this.describe = function(fs, inputLayer) {
-        var parent, x, y, width, height, fontSize, lineHeight, visible;
-        var name = PV.Base.getComponentName(inputLayer.name);
-        var containerName = name + "Container";
+        var config, parent, fontSize, lineHeight;
 
         for (var i = 0, len = inputLayer.layers.length; i < len; ++i) {
             if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
                 var area = inputLayer.layers[i];
-                x = Math.round(area.bounds[0]);
-                y = Math.round(area.bounds[1]);
                 parent = this.getParent(area);
-                x -= parent.pos[0];
-                y -= parent.pos[1];
-                width = Math.round(area.bounds[2]) - x;
-                height = Math.round(area.bounds[3]) - y;
-                visible = inputLayer.visible? true : false;
+                config = this.getConfig(area, parent);
             } else if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
                 var textItem = inputLayer.layers[i].textItem;
                 fontSize = Math.round(textItem.size);
@@ -33,15 +25,18 @@ PVQ.InputH = function() {
             }
         }
 
+        var name = PV.Base.getComponentName(inputLayer.name);
+        var containerName = name + "Container";
+
         var str = "\t\tvar " + containerName + " = G.Container.create();\n" +
-                  "\t\t" + containerName + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + containerName + ".setPos([" + config.pos + "]);\n" + 
                   "\t\t" + parent.name + ".addChild(" + containerName + ");\n" + 
                   "\t\tvar " + name + " = G.Input.create();\n" + 
-                  "\t\t" + name + ".setWidth(" + width + ");\n" +
-                  "\t\t" + name + ".setHeight(" + height + ");\n" +
+                  "\t\t" + name + ".setWidth(" + config.pos[2] + ");\n" +
+                  "\t\t" + name + ".setHeight(" + config.pos[3] + ");\n" +
                   "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
                   "\t\t" + name + ".setFontSize(" + fontSize + ");\n" +
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
+                  "\t\t" + name + ".setVisible(" + config.visible + ");\n" +
                   "\t\t" + containerName + ".addChild(" + name + ");\n" + 
                   "\t\t" + parent.name + "." + name + " = " + name + ";\n" + 
                   "\t\t" + parent.name + "." + containerName + " = " + containerName + ";\n";

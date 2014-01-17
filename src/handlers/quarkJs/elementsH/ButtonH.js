@@ -11,15 +11,8 @@ PVQ.ButtonH = function() {
      * @method describe
      */
     this.describe = function(fs, buttonLayer) {
-        var name = PV.Base.getComponentName(buttonLayer.name);
-        var x = Math.round(buttonLayer.bounds[0]);
-        var y = Math.round(buttonLayer.bounds[1]);
         var parent = this.getParent(buttonLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(buttonLayer.bounds[2]) - x;
-        var height = Math.round(buttonLayer.bounds[3]) - y;
-        var visible = buttonLayer.visible? true : false;
+        var config = this.getConfig(buttonLayer, parent);
 
         var up, down, disable;
 
@@ -73,13 +66,13 @@ PVQ.ButtonH = function() {
             current = "imgDisable";
         }
        
-        var str = "\t\tvar " + name + " = G.Button.create({\n" + 
+        var str = "\t\tvar " + config.name + " = G.Button.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                  "\t\t" + parent.name + "." +  + name + " = " + name + ";\n";
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" + 
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" +  
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
     }

@@ -11,15 +11,8 @@ PVQ.ToggleButtonH = function() {
      * @method describe
      */
     this.describe = function(fs, toggleButtonLayer) {
-        var name = PV.Base.getComponentName(toggleButtonLayer.name);
-        var x = Math.round(toggleButtonLayer.bounds[0]);
-        var y = Math.round(toggleButtonLayer.bounds[1]);
         var parent = this.getParent(toggleButtonLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(toggleButtonLayer.bounds[2]) - x;
-        var height = Math.round(toggleButtonLayer.bounds[3]) - y;
-        var visible = toggleButtonLayer.visible? true : false;
+        var config = this.getConfig(toggleButtonLayer, parent);
 
         var up, down, disable, checkup, checkdown, checkdisable;
 
@@ -112,13 +105,13 @@ PVQ.ToggleButtonH = function() {
             current = "checkedImgDisable";
         }
        
-        var str = "\t\tvar " + name + " = G.ToggleButton.create({\n" + 
+        var str = "\t\tvar " + config.name + " = G.ToggleButton.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + strs.checkedImgUp + strs.checkedImgDown + strs.checkedImgDisable + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" +
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" + 
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
     }

@@ -306,6 +306,29 @@ PVQ.BaseH = function() {
             pos: pos,
             name: name 
         }
+    },
+
+    /**
+     * 获取当前图层常用配置
+     * @params {Object} layer 当前需要处理的图层
+     * @params {Object} parent 当前需要处理的图层的父图层
+     * @method getConfig
+     */
+    this.getConfig = function(layer, parent) {
+        var name = PV.Base.getComponentName(layer.name);
+        var x = Math.round(layer.bounds[0]);
+        var y = Math.round(layer.bounds[1]);
+        x -= parent.pos[0];
+        y -= parent.pos[1];
+        var width = Math.round(layer.bounds[2]) - x;
+        var height = Math.round(layer.bounds[3]) - y;
+        var visible = layer.visible? true : false;
+
+        return {
+            name: name,
+            pos: [x, y, width, height],
+            visible: visible
+        }
     }
 };
 
@@ -323,26 +346,19 @@ PVQ.ImageH = function() {
      */
     this.describe = function(fs, imageLayer) {
         var self = this;
-        var parent = self.getParent(imageLayer);
+        // var parent = self.getParent(imageLayer);
         (function(layer) {
             var callFunc = arguments.callee;
             PV.Base.walk(layer.layers, function(layer, type) {
                 var imageLayer = layer;
                 if (imageLayer.typename == PV.Global.ART_LAYER) {
-                    var name = PV.Base.getComponentName(imageLayer.name);
-                    var x = Math.round(imageLayer.bounds[0]);
-                    var y = Math.round(imageLayer.bounds[1]);
-                    x -= parent.pos[0];
-                    y -= parent.pos[1];
-                    var width = Math.round(imageLayer.bounds[2]) - x;
-                    var height = Math.round(imageLayer.bounds[3]) - y;
-                    var visible = layer.visible? true : false;
-
-                    var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
-                              "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                              "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                              "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                              "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+                    var parent = self.getParent(imageLayer);
+                    var config = self.getConfig(imageLayer, parent);
+                    var str = "\t\tvar " + config.name + " = G.Image.create({slice: G.getSlice('" + config.name + "')});\n" + 
+                              "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" +
+                              "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" + 
+                              "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                              "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
                     fs.writeln(str);
                 } else if (PV.Base.getExName(imageLayer.name) == PV.Global.QUARKJS.ELEMENT.IMAGE 
@@ -369,15 +385,8 @@ PVQ.ButtonH = function() {
      * @method describe
      */
     this.describe = function(fs, buttonLayer) {
-        var name = PV.Base.getComponentName(buttonLayer.name);
-        var x = Math.round(buttonLayer.bounds[0]);
-        var y = Math.round(buttonLayer.bounds[1]);
         var parent = this.getParent(buttonLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(buttonLayer.bounds[2]) - x;
-        var height = Math.round(buttonLayer.bounds[3]) - y;
-        var visible = buttonLayer.visible? true : false;
+        var config = this.getConfig(buttonLayer, parent);
 
         var up, down, disable;
 
@@ -431,13 +440,13 @@ PVQ.ButtonH = function() {
             current = "imgDisable";
         }
        
-        var str = "\t\tvar " + name + " = G.Button.create({\n" + 
+        var str = "\t\tvar " + config.name + " = G.Button.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                  "\t\t" + parent.name + "." +  + name + " = " + name + ";\n";
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" + 
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" +  
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
     }
@@ -454,37 +463,33 @@ PVQ.TextH = function() {
     /**
      * 修饰 Text 类
      * @params {Objcet} fs 要写入的文件
-     * @params {Object} textItemLayer 当前需要处理的图层
+     * @params {Object} textLayer 当前需要处理的图层
      * @method describe
      */
-    this.describe = function(fs, textItemLayer) {
-        var name = PV.Base.getComponentName(textItemLayer.name);
+    this.describe = function(fs, textLayer) {
+        var name = PV.Base.getComponentName(textLayer.name);
 
-        var textLayer = textItemLayer.layers[0];
-        var x = Math.round(textLayer.bounds[0]);
-        var y = Math.round(textLayer.bounds[1]);
-        var parent = this.getParent(textItemLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(textLayer.bounds[2]) - x;
-        var height = Math.round(textLayer.bounds[3]) - y;
-        var fontSize = Math.round(textLayer.textItem.size);
-        var lineHeight = Math.round(textLayer.textItem.leading);
-        var align =  textLayer.textItem.justification.toString().split(".")[1].toLowerCase();
-        var visible = textLayer.visible? true : false;
+        var area = textLayer.layers[0];
 
-        var color = textLayer.textItem.color.rgb.hexValue;
-        var content = textLayer.textItem.contents.replace(/\r/gi, "");
+        var parent = this.getParent(textLayer);
+        var config = this.getConfig(area, parent);
+
+        var textItem = area.textItem;
+        var fontSize = Math.round(textItem.size);
+        var lineHeight = Math.round(textItem.leading);
+        var align =  textItem.justification.toString().split(".")[1].toLowerCase();
+        var color = textItem.color.rgb.hexValue;
+        var content = textItem.contents.replace(/\r/gi, "");
 
         var str = "\t\tvar " + name + " = G.Text.create();\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setPos([" + config.pos + "]);\n" + 
                   "\t\t" + name + ".setFontSize(" + fontSize + ");\n" + 
-                  "\t\t" + name + ".setWidth(" + width + ");\n" +
+                  "\t\t" + name + ".setWidth(" + config.pos[2] + ");\n" +
                   "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
                   "\t\t" + name + ".setColor('#" + color + "');\n" + 
                   "\t\t" + name + ".setTextAlign('" + align + "');\n" + 
                   "\t\t" + name + ".setText('" + content + "');\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
+                  "\t\t" + name + ".setVisible(" + config.visible + ");\n" +
                   "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
                   "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
@@ -507,15 +512,8 @@ PVQ.ToggleButtonH = function() {
      * @method describe
      */
     this.describe = function(fs, toggleButtonLayer) {
-        var name = PV.Base.getComponentName(toggleButtonLayer.name);
-        var x = Math.round(toggleButtonLayer.bounds[0]);
-        var y = Math.round(toggleButtonLayer.bounds[1]);
         var parent = this.getParent(toggleButtonLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(toggleButtonLayer.bounds[2]) - x;
-        var height = Math.round(toggleButtonLayer.bounds[3]) - y;
-        var visible = toggleButtonLayer.visible? true : false;
+        var config = this.getConfig(toggleButtonLayer, parent);
 
         var up, down, disable, checkup, checkdown, checkdisable;
 
@@ -608,13 +606,13 @@ PVQ.ToggleButtonH = function() {
             current = "checkedImgDisable";
         }
        
-        var str = "\t\tvar " + name + " = G.ToggleButton.create({\n" + 
+        var str = "\t\tvar " + config.name + " = G.ToggleButton.create({\n" + 
                   strs.imgUp + strs.imgDown + strs.imgDisable + strs.checkedImgUp + strs.checkedImgDown + strs.checkedImgDisable + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" +
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" + 
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
     }
@@ -635,15 +633,8 @@ PVQ.SwitchH = function() {
      * @method describe
      */
     this.describe = function(fs, switchLayer) {
-        var name = PV.Base.getComponentName(switchLayer.name);
-        var x = Math.round(switchLayer.bounds[0]);
-        var y = Math.round(switchLayer.bounds[1]);
         var parent = this.getParent(switchLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(switchLayer.bounds[2]) - x;
-        var height = Math.round(switchLayer.bounds[3]) - y;
-        var visible = switchLayer.visible? true : false;
+        var config = this.getConfig(switchLayer, parent);
 
         var bg, up, down;
 
@@ -697,14 +688,14 @@ PVQ.SwitchH = function() {
             current = "downBar";
         }
        
-        var str = "\t\tvar " + name + " = G.Switch.create({\n" +
-                  "\t\t\twidth: " + width + ",\n" + 
+        var str = "\t\tvar " + config.name + " = G.Switch.create({\n" +
+                  "\t\t\twidth: " + config.pos[2] + ",\n" + 
                   strs.bg + strs.upBar + strs.downBar + "\n" + 
                   "\t\t});\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" +
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" +  
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
     }
@@ -725,21 +716,13 @@ PVQ.InputH = function() {
      * @method describe
      */
     this.describe = function(fs, inputLayer) {
-        var parent, x, y, width, height, fontSize, lineHeight, visible;
-        var name = PV.Base.getComponentName(inputLayer.name);
-        var containerName = name + "Container";
+        var config, parent, fontSize, lineHeight;
 
         for (var i = 0, len = inputLayer.layers.length; i < len; ++i) {
             if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.AREA) {
                 var area = inputLayer.layers[i];
-                x = Math.round(area.bounds[0]);
-                y = Math.round(area.bounds[1]);
                 parent = this.getParent(area);
-                x -= parent.pos[0];
-                y -= parent.pos[1];
-                width = Math.round(area.bounds[2]) - x;
-                height = Math.round(area.bounds[3]) - y;
-                visible = inputLayer.visible? true : false;
+                config = this.getConfig(area, parent);
             } else if (inputLayer.layers[i].name == PV.Global.QUARKJS.Input_STATUS.TEXT) {
                 var textItem = inputLayer.layers[i].textItem;
                 fontSize = Math.round(textItem.size);
@@ -747,15 +730,18 @@ PVQ.InputH = function() {
             }
         }
 
+        var name = PV.Base.getComponentName(inputLayer.name);
+        var containerName = name + "Container";
+
         var str = "\t\tvar " + containerName + " = G.Container.create();\n" +
-                  "\t\t" + containerName + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + containerName + ".setPos([" + config.pos + "]);\n" + 
                   "\t\t" + parent.name + ".addChild(" + containerName + ");\n" + 
                   "\t\tvar " + name + " = G.Input.create();\n" + 
-                  "\t\t" + name + ".setWidth(" + width + ");\n" +
-                  "\t\t" + name + ".setHeight(" + height + ");\n" +
+                  "\t\t" + name + ".setWidth(" + config.pos[2] + ");\n" +
+                  "\t\t" + name + ".setHeight(" + config.pos[3] + ");\n" +
                   "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
                   "\t\t" + name + ".setFontSize(" + fontSize + ");\n" +
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
+                  "\t\t" + name + ".setVisible(" + config.visible + ");\n" +
                   "\t\t" + containerName + ".addChild(" + name + ");\n" + 
                   "\t\t" + parent.name + "." + name + " = " + name + ";\n" + 
                   "\t\t" + parent.name + "." + containerName + " = " + containerName + ";\n";
@@ -779,8 +765,10 @@ PVQ.AnimationH = function() {
      * @method describe
      */
     this.describe = function(fs, aniLayer) {
-		var animations = aniLayer.layers;
+        var parent = this.getParent(aniLayer);
+        var config = this.getConfig(aniLayer, parent);
 
+		var animations = aniLayer.layers;
 		var tmpStr = "";
 		var actions = "[";
 		for (var i = 0, len = animations.length; i < len; ++i) {
@@ -792,21 +780,11 @@ PVQ.AnimationH = function() {
 		}
 		actions += "\n\t\t\t]"
 		
-		var name = PV.Base.getComponentName(aniLayer.name);
-        var x = Math.round(aniLayer.bounds[0]);
-        var y = Math.round(aniLayer.bounds[1]);
-        var parent = this.getParent(aniLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(aniLayer.bounds[2]) - x;
-        var height = Math.round(aniLayer.bounds[3]) - y;
-        var visible = aniLayer.visible? true : false;
-
-        var str = "\t\tvar " + name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" + 
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" +
-                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+        var str = "\t\tvar " + config.name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" + 
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" + 
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" +
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
     }
@@ -827,21 +805,14 @@ PVQ.ContainerH = function() {
      * @method describe
      */
     this.describe = function(fs, containerLayer) {
-        var name = PV.Base.getComponentName(containerLayer.name);
-        var x = Math.round(containerLayer.bounds[0]);
-        var y = Math.round(containerLayer.bounds[1]);
         var parent = this.getParent(containerLayer);
-        x -= parent.pos[0];
-        y -= parent.pos[1];
-        var width = Math.round(containerLayer.bounds[2]) - x;
-        var height = Math.round(containerLayer.bounds[3]) - y;
-        var visible = aniLayer.visible? true : false;
+        var config = this.getConfig(containerLayer, parent);
 
-        var str = "\t\tvar " + name + " = G.Container.create();\n" + 
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
-                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
+        var str = "\t\tvar " + config.name + " = G.Container.create();\n" + 
+                  "\t\t" + config.name + ".setVisible(" + config.visible + ");\n" +
+                  "\t\t" + config.name + ".setPos([" + config.pos + "]);\n" + 
+                  "\t\t" + parent.name + ".addChild(" + config.name + ");\n" + 
+                  "\t\t" + parent.name + "." + config.name + " = " + config.name + ";\n";
 
         fs.writeln(str);
 
@@ -866,21 +837,15 @@ PVQ.DragPanelH = function() {
      * @method describe
      */
     this.describe = function(fs, dragLayer) {
-        var parent, x, y, width, height, visible;
+        var config, parent;
         var item;
 
         var self = this;
         PV.Base.walk(dragLayer.layers, function(layer, type) {
             if (layer.name == PV.Global.QUARKJS.DRAGPANEL_STATUS.AREA) {
                 var area = dragLayer.layers[i];
-                x = Math.round(area.bounds[0]);
-                y = Math.round(area.bounds[1]);
                 parent = self.getParent(area);
-                x -= parent.pos[0];
-                y -= parent.pos[1];
-                width = Math.round(area.bounds[2]) - x;
-                height = Math.round(area.bounds[3]) - y;
-                visible = dragLayer.visible? true : false;
+                config = self.getConfig(area, parent);
             } else if (PV.Base.getExName(layer.name) == PV.Global.QUARKJS.ELEMENT.ITEM) {
                 item = PV.Base.getComponentName(layer.name);
                 var str = "\t\tvar " + item + " = G.Container.create();\n";
@@ -891,15 +856,15 @@ PVQ.DragPanelH = function() {
             }
         });
         
-		var name = PV.Base.getComponentName(dragLayer.name);
+		    var name = PV.Base.getComponentName(dragLayer.name);
         var containerName = name + "Container";
         
         var str = "\t\tvar " + containerName + " = G.Container.create();\n" + 
                   "\t\tvar " + name + " = G.DragPanel.create();\n" +
-                  "\t\t" + name + ".setWidth(" + width + ");\n" +
-                  "\t\t" + name + ".setHeight(" + height + ");\n" +
-                  "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
+                  "\t\t" + name + ".setWidth(" + config.pos[2] + ");\n" +
+                  "\t\t" + name + ".setHeight(" + config.pos[3] + ");\n" +
+                  "\t\t" + name + ".setVisible(" + config.visible + ");\n" +
+                  "\t\t" + name + ".setPos([" + config.pos + "]);\n" + 
                   "\t\t" + name + ".setContent(" + containerName + ");\n" +
                   "\t\t" + parent.name + ".addChild(" + name + ");\n" +
                   "\t\t" + containerName + ".addChild(" + item + ");\n" + 
