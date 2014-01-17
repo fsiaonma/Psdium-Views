@@ -38,7 +38,8 @@ PVQ.TextH = function() {
                   "\t\t" + name + ".setTextAlign('" + align + "');\n" + 
                   "\t\t" + name + ".setText('" + content + "');\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
         fs.writeln(str);
     }

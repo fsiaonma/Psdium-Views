@@ -341,7 +341,8 @@ PVQ.ImageH = function() {
                     var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
                               "\t\t" + name + ".setVisible(" + visible + ");\n" +
                               "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                              "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                              "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                              "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
                     fs.writeln(str);
                 } else if (PV.Base.getExName(imageLayer.name) == PV.Global.QUARKJS.ELEMENT.IMAGE 
@@ -435,7 +436,8 @@ PVQ.ButtonH = function() {
                   "\t\t});\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." +  + name + " = " + name + ";\n";
 
         fs.writeln(str);
     }
@@ -483,7 +485,8 @@ PVQ.TextH = function() {
                   "\t\t" + name + ".setTextAlign('" + align + "');\n" + 
                   "\t\t" + name + ".setText('" + content + "');\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
         fs.writeln(str);
     }
@@ -610,7 +613,8 @@ PVQ.ToggleButtonH = function() {
                   "\t\t});\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
         fs.writeln(str);
     }
@@ -699,7 +703,8 @@ PVQ.SwitchH = function() {
                   "\t\t});\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
         fs.writeln(str);
     }
@@ -751,7 +756,9 @@ PVQ.InputH = function() {
                   "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
                   "\t\t" + name + ".setFontSize(" + fontSize + ");\n" +
                   "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + containerName + ".addChild(" + name + ");\n";
+                  "\t\t" + containerName + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n" + 
+                  "\t\t" + parent.name + "." + containerName + " = " + containerName + ";\n";
 
         fs.writeln(str);
     }
@@ -798,7 +805,8 @@ PVQ.AnimationH = function() {
         var str = "\t\tvar " + name + " = G.Animation.create({\n\t\t\tactions: " + actions + "\n\t\t});\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" +
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
         fs.writeln(str);
     }
@@ -832,7 +840,8 @@ PVQ.ContainerH = function() {
         var str = "\t\tvar " + name + " = G.Container.create();\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" +
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
         fs.writeln(str);
 
@@ -893,7 +902,10 @@ PVQ.DragPanelH = function() {
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + name + ".setContent(" + containerName + ");\n" +
                   "\t\t" + parent.name + ".addChild(" + name + ");\n" +
-                  "\t\t" + containerName + ".addChild(" + item + ");\n";
+                  "\t\t" + containerName + ".addChild(" + item + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n" + 
+                  "\t\t" + parent.name + "." + containerName + " = " + containerName + ";\n" + 
+                  "\t\t" + parent.name + "." + item + " = " + item + ";\n";
 
         fs.writeln(str);
     }

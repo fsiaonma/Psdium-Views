@@ -47,7 +47,10 @@ PVQ.DragPanelH = function() {
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
                   "\t\t" + name + ".setContent(" + containerName + ");\n" +
                   "\t\t" + parent.name + ".addChild(" + name + ");\n" +
-                  "\t\t" + containerName + ".addChild(" + item + ");\n";
+                  "\t\t" + containerName + ".addChild(" + item + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n" + 
+                  "\t\t" + parent.name + "." + containerName + " = " + containerName + ";\n" + 
+                  "\t\t" + parent.name + "." + item + " = " + item + ";\n";
 
         fs.writeln(str);
     }

@@ -78,7 +78,8 @@ PVQ.ButtonH = function() {
                   "\t\t});\n" + 
                   "\t\t" + name + ".setVisible(" + visible + ");\n" + 
                   "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" +  
-                  "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                  "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." +  + name + " = " + name + ";\n";
 
         fs.writeln(str);
     }

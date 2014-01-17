@@ -42,7 +42,9 @@ PVQ.InputH = function() {
                   "\t\t" + name + ".setLineHeight(" + lineHeight + ");\n" +
                   "\t\t" + name + ".setFontSize(" + fontSize + ");\n" +
                   "\t\t" + name + ".setVisible(" + visible + ");\n" +
-                  "\t\t" + containerName + ".addChild(" + name + ");\n";
+                  "\t\t" + containerName + ".addChild(" + name + ");\n" + 
+                  "\t\t" + parent.name + "." + name + " = " + name + ";\n" + 
+                  "\t\t" + parent.name + "." + containerName + " = " + containerName + ";\n";
 
         fs.writeln(str);
     }

@@ -30,7 +30,8 @@ PVQ.ImageH = function() {
                     var str = "\t\tvar " + name + " = G.Image.create({slice: G.getSlice('" + name + "')});\n" + 
                               "\t\t" + name + ".setVisible(" + visible + ");\n" +
                               "\t\t" + name + ".setPos([" + x + ", " + y + ", " + width + ", " + height + "]);\n" + 
-                              "\t\t" + parent.name + ".addChild(" + name + ");\n";
+                              "\t\t" + parent.name + ".addChild(" + name + ");\n" + 
+                              "\t\t" + parent.name + "." + name + " = " + name + ";\n";
 
                     fs.writeln(str);
                 } else if (PV.Base.getExName(imageLayer.name) == PV.Global.QUARKJS.ELEMENT.IMAGE 
