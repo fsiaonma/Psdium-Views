@@ -22,17 +22,16 @@ PVQ.dispatcher = (function() {
          */
         processDoc: function() {
             // 切片文件处理
-            if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE) {
-                var sliceFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE);
-                var files = File.decode(sliceFolder.getFiles()).split(",");
-                for (var i = 0, len = files.length; i < len; ++i) {
-                    var doc = open(File(files[i]));
-                    PVQ.processSliceFile(doc);
-                    doc.close();
-                }
-            }
+            // if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE) {
+            //     var sliceFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE);
+            //     var files = File.decode(sliceFolder.getFiles()).split(",");
+            //     for (var i = 0, len = files.length; i < len; ++i) {
+            //         var doc = open(File(files[i]));
+            //         PVQ.processSliceFile(doc);
+            //         doc.close();
+            //     }
+            // }
             
-            // 对位文件处理
             if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS) {
                 var posFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS);
                 var files = File.decode(posFolder.getFiles()).split(",");
@@ -41,7 +40,10 @@ PVQ.dispatcher = (function() {
 
                     PV.Base.walk(doc.layers, function(layer, type) {
                         if (type == PV.Global.QUARKJS.VIEW) {
+                            // 生成视图文件
                             PVQ.processPosFile(layer);
+                            // 生成切片文件
+                            PVQ.processSliceFile(doc);
                         }
                     });
 
