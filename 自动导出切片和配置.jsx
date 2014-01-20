@@ -1,12 +1,9 @@
 ﻿/**
- * Psdium-Views quarkJs 切片文件处理方法
- * @params {Objcet} doc 当前文本对象
+ * Psdium-Views 程序主入口
+ * @params {Objcet} application psd 应用程序
+ * @method 
  */
-PVQ.processSliceFile = function(d) {
-    /**
-     * 生成切片文件
-     * @params {Objcet} doc 当前文本对象
-     */
+(function(app) {
     var log = function(str){
         //$.write (str);
     };
@@ -14,7 +11,18 @@ PVQ.processSliceFile = function(d) {
     
     log("-- 程序开始 --");
     
-       
+    // Save the current preferences
+    var startRulerUnits = app.preferences.rulerUnits;
+    var startTypeUnits = app.preferences.typeUnits;
+    var startDisplayDialogs = app.displayDialogs;
+    
+	// 禁止弹出框
+	displayDialogs =DialogModes.NO;
+    
+	// 转换长度单位为像素
+	preferences.rulerUnits = Units.PIXELS;
+    preferences.typeUnits = TypeUnits.PIXELS;
+    
     //忽略列表
     var ignoreList = [/^text_/, /area/, /^input_/];
     
@@ -28,12 +36,20 @@ PVQ.processSliceFile = function(d) {
     //设置填充间隙
     var gap = 5;
     
+    
+    
     //日志缩进
     var tab = "";
     
     //输出配置字符串
     var output = "Slice = window.Slice || {};\n";
-        
+    
+    //取得当前打开文档
+    var d = app.activeDocument;
+
+    //当前路径
+    var path = d.path;
+    
     //定义全局变量
     var sliceName = d.name.substring(0, d.name.indexOf('.'));
     sliceName = hex_md5(sliceName);
@@ -61,7 +77,7 @@ PVQ.processSliceFile = function(d) {
         var name = doc.name;
         app.activeDocument = doc;
         doc.resizeCanvas (totalW, totalH, AnchorPosition.TOPLEFT);
-        var newFile = File(PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.IMAGE + name);
+        var newFile = File(path + "/" + name);
         var opt = new PNGSaveOptions();
         opt.compression = 0;
         doc.saveAs (newFile, opt);
@@ -181,7 +197,7 @@ PVQ.processSliceFile = function(d) {
     
     //输出配置
     log(output);
-    var fileName = PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.SLICE + "Slice.js";
+    var fileName = path + "/Slice.js";
     var fs = File(fileName);
     fs.open("w");
     fs.encoding = "utf-8";
@@ -190,9 +206,17 @@ PVQ.processSliceFile = function(d) {
     
     //输出存储路径
     log("存储路径: " + fileName);
- 
     
-};
+    // Reset the application preferences
+    app.preferences.rulerUnits = startRulerUnits
+    app.preferences.typeUnits = startTypeUnits
+    app.displayDialogs = startDisplayDialogs
+
+})(app);
+
+
+
+
 
 
 
