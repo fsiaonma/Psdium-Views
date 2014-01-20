@@ -35,6 +35,7 @@ PVQ.dispatcher = (function() {
             if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS) {
                 var posFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS);
                 var files = File.decode(posFolder.getFiles()).split(",");
+                
                 for (var i = 0, len = files.length; i < len; ++i) {
                     var doc = open(File(files[i]));
 
@@ -46,10 +47,25 @@ PVQ.dispatcher = (function() {
                     });
                 
                     // 生成切片文件
-                    PVQ.processSliceFile(doc);
+                    PVQ.G.d = doc;
+                    if(i == 0){
+                        PVQ.G.newDoc = PVQ.G.newDocument(PVQ.G.d);
+                    }
+                    PVQ.G.searching(PVQ.G.d.layers);
 
                     doc.close(SaveOptions.DONOTSAVECHANGES);
                 }
+                
+                //保存最后一个切图
+                PVQ.G.savePNG(PVQ.G.newDoc);
+            
+                //输出配置
+                var fileName = PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.SLICE + "Slice.js";
+                var fs = File(fileName);
+                fs.open("w");
+                fs.encoding = "utf-8";
+                fs.writeln(PVQ.G.output);
+                fs.close();
             }
         },
 

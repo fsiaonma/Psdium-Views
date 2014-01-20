@@ -2,118 +2,102 @@
  * Psdium-Views quarkJs 切片文件处理方法
  * @params {Objcet} doc 当前文本对象
  */
-PVQ.processSliceFile = function(d) {
-    /**
-     * 生成切片文件
-     * @params {Objcet} doc 当前文本对象
-     */
-    var log = function(str){
+PVQ.G = {
+    d : null,
+    log = function(str){
         //$.write (str);
-    };
-    
-    
-    log("-- 程序开始 --");
-    
-       
+    },
+     
     //忽略列表
-    var ignoreList = [/^text_/, /area/, /^input_/];
+    ignoreList : [/^text_/, /area/, /^input_/],
     
     //实际画布大小
-    var totalW = 0;
-    var totalH = 0;
+    totalW : 0,
+    totalH : 0,
     //新建画布大小, 预留大些
-    var orgW = 2000;
-    var orgH = 2000;
+    orgW : 2000,
+    orgH : 2000,
     
     //设置填充间隙
-    var gap = 5;
+    gap : 5,
     
     //日志缩进
-    var tab = "";
+    tab : "",
     
     //输出配置字符串
-    var output = "Slice = window.Slice || {};\n";
-        
-    //定义全局变量
-    var sliceName = d.name.substring(0, d.name.indexOf('.'));
-    sliceName = hex_md5(sliceName);
-    var count = 0;
-    var maxW = 1024;
-    var maxH = 1024;
-    var x = 0;
-    var y = 0;
-    var nextY = y;
-    
-    
+    output : "Slice = window.Slice || {};\n",
+    count : 0,
+    maxW : 1024,
+    maxH : 1024,
+    x : 0,
+    y : 0,
+    nextY : 0,
+    //检查名字是否重复
+    sliceNames : [],
+    //当前新文档
+    newDoc : null,
     
     //新建
-    var newDocument = function(d){
-        var name = sliceName + count;
-        count++;
-        var doc = app.documents.add(orgW, orgH, d.resolution, name, 
-                            d.mode.ColorModel, DocumentFill.TRANSPARENT, 1);
-        log(tab + "新建文件: " + name);
-        output += 'Slice["' + name + '.png"] = {' + '\n';
+    newDocument : function(d){
+        var name = "slice" + PVQ.G.count;
+        PVQ.G.count++;
+        var doc = app.documents.add(PVQ.G.orgW, PVQ.G.orgH, PVQ.G.d.resolution, name, 
+                            PVQ.G.d.mode.ColorModel, DocumentFill.TRANSPARENT, 1);
+        PVQ.G.log(PVQ.G.tab + "新建文件: " + name);
+        PVQ.G.output += 'Slice["' + name + '.png"] = {' + '\n';
         return doc;
-    };
+    },
     //保存
-    var savePNG = function(doc){
+    savePNG : function(doc){
         var name = doc.name;
         app.activeDocument = doc;
-        doc.resizeCanvas (totalW, totalH, AnchorPosition.TOPLEFT);
+        doc.resizeCanvas (PVQ.G.totalW, PVQ.G.totalH, AnchorPosition.TOPLEFT);
         var newFile = File(PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.IMAGE + name);
         var opt = new PNGSaveOptions();
         opt.compression = 0;
         doc.saveAs (newFile, opt);
-        log(tab + "保存文件: " + name);
+        PVQ.G.log(PVQ.G.tab + "保存文件: " + name);
         doc.close (SaveOptions.DONOTSAVECHANGES);
-        output = output.substring(0, output.length - 2);
-        output += '\n};\n';
-    };
+        PVQ.G.output = PVQ.G.output.substring(0, PVQ.G.output.length - 2);
+        PVQ.G.output += '\n};\n';
+    },
     //检查名字是否重复
-    var sliceNames = [];
-    var isRepeat = function(name){
-        for(var i=0; i<sliceNames.length; i++){
-            var s = sliceNames[i];
+    isRepeat : function(name){
+        for(var i=0; i<PVQ.G.sliceNames.length; i++){
+            var s = PVQ.G.sliceNames[i];
             if(s == name){
-                log(tab + "[WARN] 切片名字重复: " + name);
+                PVQ.G.log(PVQ.G.tab + "[WARN] 切片名字重复: " + name);
                 return true;
             }
         }
         return false;
-    };
+    },
     //检查名字是否在忽略列表
-    var isIgnored = function(name){
+    isIgnored : function(name){
         var nname = name.toLowerCase();
-        for(var i=0; i<ignoreList.length; i++){
-            var regexp = ignoreList[i];
+        for(var i=0; i<PVQ.G.ignoreList.length; i++){
+            var regexp = PVQ.G.ignoreList[i];
             if(nname.match (regexp) != null){
-                log(tab + "[WARN] 忽略该切片名字: " + name);
+                PVQ.G.log(PVQ.G.tab + "[WARN] 忽略该切片名字: " + name);
                 return true;
             }
         }
         return false;
-    };
-
-    //开始处理
-    var layers = d.layers;
+    },
     
-    //新建文档
-    var newDoc = newDocument(d);
-    
-    var searching = function(ls){
+    searching : function(ls){
         for(var i=0; i<ls.length; i++){
             var l = ls[i];
-            app.activeDocument = d;
-            d.activeLayer = l;
+            app.activeDocument = PVQ.G.d;
+            PVQ.G.d.activeLayer = l;
             //判断图层名称, 该位置不要放错
-            if(!isRepeat (l.name) && !isIgnored(l.name)){
+            if(!PVQ.G.isRepeat (l.name) && !PVQ.G.isIgnored(l.name)){
                 if(l.typename == "LayerSet"){
-                    log(tab + "进入文件夹: " + l.name);
-                    tab += "  ";
-                    searching(l.layers);
-                    tab = tab.substring(0, tab.length - 2);
-                    log(tab + "退出文件夹: " + l.name);
+                    PVQ.G.log(PVQ.G.tab + "进入文件夹: " + l.name);
+                    PVQ.G.tab += "  ";
+                    PVQ.G.searching(l.layers);
+                    PVQ.G.tab = PVQ.G.tab.substring(0, PVQ.G.tab.length - 2);
+                    PVQ.G.log(PVQ.G.tab + "退出文件夹: " + l.name);
                     continue;
                 }else if(l.typename == "ArtLayer" && l.kind != LayerKind.SOLIDFILL){
                     //获取宽高
@@ -122,77 +106,59 @@ PVQ.processSliceFile = function(d) {
                     var h = bounds[3] - bounds[1];
                     
                     //越界处理
-                    var ww = x + w;
-                    if(ww >maxW){
+                    var ww = PVQ.G.x + w;
+                    if(ww >PVQ.G.maxW){
                         //换行
-                        y = nextY;
-                        x = 0;
+                        PVQ.G.y = PVQ.G.nextY;
+                        PVQ.G.x = 0;
                         ww = w;
-                        log(tab + "换行, 下一个Y坐标是: " + y);
+                        PVQ.G.log(PVQ.G.tab + "换行, 下一个Y坐标是: " + y);
                     }
-                    var hh = y + h;
-                    if(hh > maxH){
+                    var hh = PVQ.G.y + h;
+                    if(hh > PVQ.G.maxH){
                         //另起文件
-                        savePNG(newDoc);
-                        newDoc = newDocument(d);
-                        x = y = nextY = totalW = totalH = 0;
-                        ww = x + w;
-                        hh = y + h;
-                        log(tab + "另起文件: " + newDoc.name);
+                        PVQ.G.savePNG(PVQ.G.newDoc);
+                        PVQ.G.newDoc = PVQ.G.newDocument(d);
+                        PVQ.G.x = PVQ.G.y = PVQ.G.nextY = PVQ.G.totalW = PVQ.G.totalH = 0;
+                        ww = PVQ.G.x + w;
+                        hh = PVQ.G.y + h;
+                        PVQ.G.log(PVQ.G.tab + "另起文件: " + PVQ.G.newDoc.name);
                     }
                     
                     //粘贴到新文档
-                    app.activeDocument = d;
-                    d.activeLayer = l;
-                    log(tab + "发现切片: " + l.name + ", " + l.kind);
+                    app.activeDocument = PVQ.G.d;
+                    PVQ.G.d.activeLayer = l;
+                    PVQ.G.log(PVQ.G.tab + "发现切片: " + l.name + ", " + l.kind);
                     l.copy();
-                    app.activeDocument = newDoc;
-                    var newL = newDoc.paste ();
-                    newDoc.activeLayer = newL;
+                    app.activeDocument = PVQ.G.newDoc;
+                    var newL = PVQ.G.newDoc.paste ();
+                    PVQ.G.newDoc.activeLayer = newL;
                     var newBounds = newL.bounds;
-                    log(tab + "Bounds: " + newBounds[0] + ", " + newBounds[1] + ", " + newBounds[2] + ", " + newBounds[3] 
+                    PVQ.G.log(PVQ.G.tab + "Bounds: " + newBounds[0] + ", " + newBounds[1] + ", " + newBounds[2] + ", " + newBounds[3] 
                                         + ", 宽高: " + w + ", " + h);
                     //设置位置
                     newL.translate(-newBounds[0] + x, -newBounds[1] + y, OffsetUndefinedAreas.SETTOBACKGROUND);
-                    log(tab + "输出新切片: " + newL.name);
+                    PVQ.G.log(PVQ.G.tab + "输出新切片: " + newL.name);
                     //添加到配置字符串
-                    output += '\t"' + l.name + '" : [' + Number(x) + ',' + Number(y) + ',' + Number(w) + ',' + Number(h) + '],' + '\n';
+                    PVQ.G.output += '\t"' + l.name + '" : [' + Number(x) + ',' + Number(y) + ',' + Number(w) + ',' + Number(h) + '],' + '\n';
                 
                     //计算实际画布大小
-                    totalW = ww > totalW ? ww : totalW;
-                    totalH = hh > totalH ? hh : totalH;
-                    log('totalW = ' + totalW + ', totalH = ' + totalH);
+                    PVQ.G.totalW = ww > PVQ.G.totalW ? ww : PVQ.G.totalW;
+                    PVQ.G.totalH = hh > PVQ.G.totalH ? hh : PVQ.G.totalH;
+                    PVQ.G.log('PVQ.G.totalW = ' + PVQ.G.totalW + ', PVQ.G.totalH = ' + PVQ.G.totalH);
                     //计算下一次切图摆放位置
-                    x += w + gap;
-                    nextY = totalH + gap;
+                    PVQ.G.x += w + PVQ.G.gap;
+                    PVQ.G.nextY = PVQ.G.totalH + PVQ.G.gap;
                     //记住该名字
-                    sliceNames.push(l.name);
+                    PVQ.G.sliceNames.push(l.name);
                 }else{
-                    log(tab + "[WARN] 切片格式不支持: " + l.name + ", LayerKind: " + l.kind);
+                    PVQ.G.log(PVQ.G.tab + "[WARN] 切片格式不支持: " + l.name + ", LayerKind: " + l.kind);
                 }
             }
         }
     }//end searching
-    
-    searching(layers);
-
-    savePNG(newDoc);
-    app.activeDocument = d;
-    
-    //输出配置
-    log(output);
-    var fileName = PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.SLICE + "Slice.js";
-    var fs = File(fileName);
-    fs.open("w");
-    fs.encoding = "utf-8";
-    fs.writeln(output);
-    fs.close();
-    
-    //输出存储路径
-    log("存储路径: " + fileName);
- 
-    
 };
+
 
 
 
