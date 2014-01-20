@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PVQ.dipatcher QuarkJs 元素处理分派器
  * @constructor
  */
@@ -42,12 +42,13 @@ PVQ.dispatcher = (function() {
                         if (type == PV.Global.QUARKJS.VIEW) {
                             // 生成视图文件
                             PVQ.processPosFile(layer);
-                            // 生成切片文件
-                            PVQ.processSliceFile(doc);
                         }
                     });
+                
+                    // 生成切片文件
+                    PVQ.processSliceFile(doc);
 
-                    doc.close();
+                    doc.close(SaveOptions.DONOTSAVECHANGES);
                 }
             }
         },
