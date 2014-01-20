@@ -123,7 +123,7 @@
             app.activeDocument = d;
             d.activeLayer = l;
             //判断图层名称, 该位置不要放错
-            if(!isRepeat (l.name) && !isIgnored(l.name)){
+            if(!isIgnored(l.name)){
                 if(l.typename == "LayerSet"){
                     log(tab + "进入文件夹: " + l.name);
                     tab += "  ";
@@ -131,7 +131,7 @@
                     tab = tab.substring(0, tab.length - 2);
                     log(tab + "退出文件夹: " + l.name);
                     continue;
-                }else if(l.typename == "ArtLayer" && l.kind != LayerKind.SOLIDFILL){
+                }else if(!isRepeat (l.name) && l.typename == "ArtLayer" && l.kind != LayerKind.SOLIDFILL){
                     //获取宽高
                     var bounds = l.bounds;
                     var w = bounds[2] - bounds[0];
@@ -197,7 +197,7 @@
     
     //输出配置
     log(output);
-    var fileName = path + "/Slice.js";
+    var fileName = path + "/" + sliceName + ".js";
     var fs = File(fileName);
     fs.open("w");
     fs.encoding = "utf-8";
