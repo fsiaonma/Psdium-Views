@@ -59,64 +59,64 @@ PVQ.dispatcher = (function() {
          * @method switchElement
          */
         processElements: function(fs, layer, type) {
-            switch (type) {
-                case PV.Global.QUARKJS.ELEMENT.BUTTON: {
+            switch (type.toLowerCase()) {
+                case PV.Global.QUARKJS.ELEMENT.BUTTON.toLowerCase(): {
                     if (!buttonH) {
                         buttonH = new PVQ.ButtonH();
                     }
                     buttonH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.IMAGE: {
+                case PV.Global.QUARKJS.ELEMENT.IMAGE.toLowerCase(): {
                     if (!imageH) {
                         imageH = new PVQ.ImageH();
                     }
                     imageH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.TEXT: {
+                case PV.Global.QUARKJS.ELEMENT.TEXT.toLowerCase(): {
                     if (!textH) {
                         textH = new PVQ.TextH();
                     }
                     textH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.CONTAINER: {
+                case PV.Global.QUARKJS.ELEMENT.CONTAINER.toLowerCase(): {
                     if (!containerH) {
                         containerH = new PVQ.ContainerH();
                     }
                     containerH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.TOGGLE_BUTTON: {
+                case PV.Global.QUARKJS.ELEMENT.TOGGLE_BUTTON.toLowerCase(): {
                     if (!toggleButtonH) {
                         toggleButtonH = new PVQ.ToggleButtonH();
                     }
                     toggleButtonH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.SWITCH: {
+                case PV.Global.QUARKJS.ELEMENT.SWITCH.toLowerCase(): {
                     if (!switchH) {
                         switchH = new PVQ.SwitchH();
                     }
                     switchH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.INPUT: {
+                case PV.Global.QUARKJS.ELEMENT.INPUT.toLowerCase(): {
                     if (!inputH) {
                         inputH = new PVQ.InputH();
                     }
                     inputH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.ANIMATION: {
+                case PV.Global.QUARKJS.ELEMENT.ANIMATION.toLowerCase(): {
                     if (!animationH) {
                         animationH = new PVQ.AnimationH();
                     }
                     animationH.describe(fs, layer);
                     break ;
                 }
-                case PV.Global.QUARKJS.ELEMENT.DRAGPANEL: {
+                case PV.Global.QUARKJS.ELEMENT.DRAGPANEL.toLowerCase(): {
                     if (!dragPanelH) {
                         dragPanelH = new PVQ.DragPanelH();
                     }
