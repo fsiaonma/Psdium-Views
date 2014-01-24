@@ -34,12 +34,12 @@ config.projects = [{
     js: {                   // javascript 压缩打包配置项
         compression: [{         // javascript 压缩配置项。（数组中可配置多个对象）
             dir: [
+                'src/common/config.js',
                 'src/libs/console.js',
 
                 'src/pv.js',
 
                 'src/common/base.js',
-                'src/common/config.js',
                 'src/common/global.js',
 
                 'src/handlers/quarkJs/DocsH/SliceH.js',

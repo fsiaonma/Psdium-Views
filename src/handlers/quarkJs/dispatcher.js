@@ -21,17 +21,6 @@ PVQ.dispatcher = (function() {
          * @method processDoc
          */
         processDoc: function() {
-            // 切片文件处理
-            // if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE) {
-            //     var sliceFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE);
-            //     var files = File.decode(sliceFolder.getFiles()).split(",");
-            //     for (var i = 0, len = files.length; i < len; ++i) {
-            //         var doc = open(File(files[i]));
-            //         PVQ.processSliceFile(doc);
-            //         doc.close();
-            //     }
-            // }
-            
             if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS) {
                 var posFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS);
                 var files = File.decode(posFolder.getFiles()).split(",");
