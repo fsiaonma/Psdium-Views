@@ -91,13 +91,13 @@ PV.Config = (function() {
         LIB_MODE: {
         	QUARKJS: {
                 SOURCE_PATH: {
-                    // SLICE: "/d/Github/Psdium-Views/demo/ui_slice/",
+                    SLICE: "/d/Github/Psdium-Views/demo/ui_slice/",
                     POS: "/d/Github/Psdium-Views/demo/ui_pos/"
                 },
                 EXPORT_PATH: {
-                    SLICE: "/c/wamp/www/workplace/testPSD2V/scripts/configs/",
-                    POS: "/c/wamp/www/workplace/testPSD2V/scripts/views/",
-                    IMAGE: "/c/wamp/www/workplace/testPSD2V/images/"
+                    SLICE: "/d/Github/Psdium-Views/demo/r_d_images/",
+                    POS: "/d/Github/Psdium-Views/demo/r_d_pos/",
+                    IMAGE: "/d/Github/Psdium-Views/demo/r_d_slice/"
                 }
             }
         }
@@ -992,17 +992,6 @@ PVQ.dispatcher = (function() {
          * @method processDoc
          */
         processDoc: function() {
-            // 切片文件处理
-            // if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE) {
-            //     var sliceFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.SLICE);
-            //     var files = File.decode(sliceFolder.getFiles()).split(",");
-            //     for (var i = 0, len = files.length; i < len; ++i) {
-            //         var doc = open(File(files[i]));
-            //         PVQ.processSliceFile(doc);
-            //         doc.close();
-            //     }
-            // }
-            
             if (PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS) {
                 var posFolder = Folder(PV.Config.LIB_MODE.QUARKJS.SOURCE_PATH.POS);
                 var files = File.decode(posFolder.getFiles()).split(",");
