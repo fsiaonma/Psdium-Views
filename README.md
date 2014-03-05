@@ -20,7 +20,7 @@
 
 ### 1.找到文件 Psdium-Views/production/PsdiumViews.jsx
 
-2.进入文件找到以下代码段
+### 2.进入文件找到以下代码段
 
 >     PV.Config = (function() {
 >         return {
@@ -57,12 +57,12 @@
 + 配置图片资源生成路径（运行后图片资源将存放于该路径下）eg:
 >     IMAGE: "/d/Github/Psdium-Views/demo/r_d_images/"
 
-3.将 PsdiumViews.jsx 文件复制到 cs6 脚本目录下。
+### 3.将 PsdiumViews.jsx 文件复制到 cs6 脚本目录下。
 
 + 找到目录：$(CS6目录)\Presets\Scripts  eg：
 >    C:\Program Files\Adobe\Adobe Photoshop CS6 (64 Bit)\Presets\Scripts
 
-4.打开 cs6，文件->脚本->PsdiumViews,点击运行即可。
+### 4.打开 cs6，文件->脚本->PsdiumViews,点击运行即可。
 
 ![alt text](./demo.png "Title")
 
