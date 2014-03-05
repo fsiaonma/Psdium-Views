@@ -10,7 +10,6 @@ PV.Config = (function() {
         LIB_MODE: {
         	QUARKJS: {
                 SOURCE_PATH: {
-                    SLICE: "/d/Github/Psdium-Views/demo/ui_slice/",
                     POS: "/d/Github/Psdium-Views/demo/ui_pos/"
                 },
                 EXPORT_PATH: {

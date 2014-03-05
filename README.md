@@ -29,7 +29,6 @@
 >             LIB_MODE: {
 >             	QUARKJS: {
 >                     SOURCE_PATH: {
->                         SLICE: "/d/Github/Psdium-Views/demo/ui_slice/",
 >                         POS: "/d/Github/Psdium-Views/demo/ui_pos/"
 >                     },
 >                     EXPORT_PATH: {
@@ -41,9 +40,6 @@
 >             }
 >         }
 >     })();
-
-+ 配置切片 psd 文件路径（运行时工具将到该目录下找对应的切片类 psd 文件）eg:
->     SLICE: "/d/Github/Psdium-Views/demo/ui_slice/"
 
 + 配置对文 psd 文件路径（运行时工具将到该目录下找对应的场景类 psd 文件）eg:
 >     POS: "/d/Github/Psdium-Views/demo/ui_pos/"
