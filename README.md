@@ -60,10 +60,11 @@
 ### 3.将 PsdiumViews.jsx 文件复制到 cs6 脚本目录下。
 
 + 找到目录：$(CS6目录)\Presets\Scripts  eg：
->    C:\Program Files\Adobe\Adobe Photoshop CS6 (64 Bit)\Presets\Scripts
+>     C:\Program Files\Adobe\Adobe Photoshop CS6 (64 Bit)\Presets\Scripts
 
-### 4.打开 cs6，文件->脚本->PsdiumViews,点击运行即可。
+### 4.重启 cs6，文件->脚本->PsdiumViews,点击运行即可。
 
 ![alt text](./demo.png "Title")
 
-power by uc游戏大厅.
+power by uc游戏大厅
+===================
