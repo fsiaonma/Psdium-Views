@@ -21,31 +21,7 @@ var pos2V = G.Container.getClass().extend({
 		this.addChild(input);
 		this.input = input;
 
-		var changyongyuitem = G.Container.create();
-
-		var xian = G.Image.create({slice: G.getSlice('xian')});
-		xian.setVisible(true);
-		xian.setPos([164,291,628,6]);
-		this.addChild(xian);
-		this.xian = xian;
-
-		var xuanzhong = G.Image.create({slice: G.getSlice('xuanzhong')});
-		xuanzhong.setVisible(true);
-		xuanzhong.setPos([162,231,625,59]);
-		this.addChild(xuanzhong);
-		this.xuanzhong = xuanzhong;
-
-		var changyongyutext = G.Text.create();
-		changyongyutext.setPos([34,15,508,259]);
-		changyongyutext.setFontSize(28);
-		changyongyutext.setWidth(508);
-		changyongyutext.setLineHeight(39);
-		changyongyutext.setColor('#643814');
-		changyongyutext.setTextAlign('left');
-		changyongyutext.setText('快点吧，我等到花儿也谢了！');
-		changyongyutext.setVisible(true);
-		changyongyuitem.addChild(changyongyutext);
-		changyongyuitem.changyongyutext = changyongyutext;
+		var changyongyuitem = new Changyongyuitem();
 
 		var changyongyuContainer = G.Container.create();
 		var changyongyu = G.DragPanel.create();

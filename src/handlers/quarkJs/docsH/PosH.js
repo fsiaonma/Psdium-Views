@@ -5,7 +5,6 @@
  */
 PVQ.processPosFile = (function() {
     return function(layer) {
-
         var start = layer.name.indexOf("_") + 1;
         var vName = layer.name.substr(start) + "V";
 

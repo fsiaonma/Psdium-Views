@@ -14,6 +14,7 @@ PV.Config = (function() {
                 },
                 EXPORT_PATH: {
                     SLICE: "/d/Github/Psdium-Views/demo/r_d_slice/",
+                    ITEMS: "/d/Github/Psdium-Views/demo/r_d_pos/items/",
                     POS: "/d/Github/Psdium-Views/demo/r_d_pos/",
                     IMAGE: "/d/Github/Psdium-Views/demo/r_d_images/"
                 }

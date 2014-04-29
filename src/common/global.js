@@ -18,6 +18,8 @@ PV.Global = (function() {
         QUARKJS: {
             VIEW: "View",
 
+            ITEM: "Item",
+
             ELEMENT: {
                 IMAGE: "Image",
                 BUTTON: "Button",

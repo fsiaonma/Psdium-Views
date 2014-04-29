@@ -22,11 +22,8 @@ PVQ.DragPanelH = function() {
                 config = self.getConfig(area, parent);
             } else if (PV.Base.getExName(layer.name) == PV.Global.QUARKJS.ELEMENT.ITEM) {
                 item = PV.Base.getComponentName(layer.name);
-                var str = "\t\tvar " + item + " = G.Container.create();\n";
+                var str = "\t\tvar " + item + " = new " + item.replace(item[0], item[0].toUpperCase()) + "();\n";
                 fs.writeln(str);
-                PV.Base.walk(layer.layers, function(layer, type) {
-                    PVQ.dispatcher.processElements(fs, layer, type);
-                });
             }
         });
         

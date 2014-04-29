@@ -42,6 +42,7 @@ config.projects = [{
                 'src/common/base.js',
                 'src/common/global.js',
 
+                'src/handlers/quarkJs/DocsH/ItemH.js',
                 'src/handlers/quarkJs/DocsH/SliceH.js',
                 'src/handlers/quarkJs/DocsH/PosH.js',
 
@@ -74,6 +75,7 @@ config.projects = [{
                 'src/common/config.js',
                 'src/common/global.js',
 
+                'src/handlers/quarkJs/DocsH/ItemH.js',
                 'src/handlers/quarkJs/DocsH/SliceH.js',
                 'src/handlers/quarkJs/DocsH/PosH.js',
 

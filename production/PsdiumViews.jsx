@@ -95,6 +95,7 @@ PV.Config = (function() {
                 },
                 EXPORT_PATH: {
                     SLICE: "/d/Github/Psdium-Views/demo/r_d_slice/",
+                    ITEMS: "/d/Github/Psdium-Views/demo/r_d_pos/items/",
                     POS: "/d/Github/Psdium-Views/demo/r_d_pos/",
                     IMAGE: "/d/Github/Psdium-Views/demo/r_d_images/"
                 }
@@ -122,6 +123,8 @@ PV.Global = (function() {
         // QuarkJS 元素
         QUARKJS: {
             VIEW: "View",
+
+            ITEM: "Item",
 
             ELEMENT: {
                 IMAGE: "Image",
@@ -166,6 +169,39 @@ PV.Global = (function() {
                 AREA: "area"
             }
         }
+    }
+})();
+
+/**
+ * Psdium-Views quarkJs 对位文件处理方法
+ * @params {Objcet} layer 当前原件对象
+ * @method processItemFile
+ */
+PVQ.processItemFile = (function() {
+    return function(layer) {
+        var start = layer.name.indexOf("_") + 1;
+        var vName = layer.name.substr(start) + "V";
+        vName = vName.replace(vName[0], vName[0].toUpperCase())
+
+        var fs = new File(PV.Config.LIB_MODE.QUARKJS.EXPORT_PATH.ITEMS + vName + ".js");
+        fs.encoding = "utf-8";
+
+        fs.open("w:");
+
+        fs.writeln(
+            "var " + vName + " = G.Container.getClass().extend({\n" +
+            "\tinit:function(){\n\n" + 
+            "\t\tthis._super(arguments);\n"
+        );
+
+        PV.Base.walk(layer.layers, function(layer, type) {
+            PVQ.dispatcher.processElements(fs, layer, type);
+        });
+        
+        fs.writeln("\t}");
+        fs.writeln("});");
+
+        fs.close();
     }
 })();
 
@@ -341,7 +377,6 @@ PVQ.G = {
  */
 PVQ.processPosFile = (function() {
     return function(layer) {
-
         var start = layer.name.indexOf("_") + 1;
         var vName = layer.name.substr(start) + "V";
 
@@ -384,7 +419,7 @@ PVQ.BaseH = function() {
         var parent = layer.parent;
         var type = parent.name.substr(0, parent.name.indexOf("_"));
 
-        if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER || type == PV.Global.QUARKJS.ELEMENT.ITEM) {
+        if (type == PV.Global.QUARKJS.ELEMENT.CONTAINER) {
             name = PV.Base.getComponentName(parent.name);
             pos = [Math.round(parent.bounds[0]), Math.round(parent.bounds[1])];
         } else {
@@ -938,11 +973,11 @@ PVQ.DragPanelH = function() {
                 config = self.getConfig(area, parent);
             } else if (PV.Base.getExName(layer.name) == PV.Global.QUARKJS.ELEMENT.ITEM) {
                 item = PV.Base.getComponentName(layer.name);
-                var str = "\t\tvar " + item + " = G.Container.create();\n";
+                var str = "\t\tvar " + item + " = new " + item.replace(item[0], item[0].toUpperCase()) + "();\n";
                 fs.writeln(str);
-                PV.Base.walk(layer.layers, function(layer, type) {
-                    PVQ.dispatcher.processElements(fs, layer, type);
-                });
+                // PV.Base.walk(layer.layers, function(layer, type) {
+                //     PVQ.dispatcher.processElements(fs, layer, type);
+                // });
             }
         });
         
@@ -1000,8 +1035,10 @@ PVQ.dispatcher = (function() {
 
                     PV.Base.walk(doc.layers, function(layer, type) {
                         if (type == PV.Global.QUARKJS.VIEW) {
-                            // 生成视图文件
                             PVQ.processPosFile(layer);
+                        }
+                        if (type == PV.Global.QUARKJS.ITEM) {
+                            PVQ.processItemFile(layer);
                         }
                     });
                 

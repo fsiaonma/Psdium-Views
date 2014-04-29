@@ -30,8 +30,10 @@ PVQ.dispatcher = (function() {
 
                     PV.Base.walk(doc.layers, function(layer, type) {
                         if (type == PV.Global.QUARKJS.VIEW) {
-                            // 生成视图文件
                             PVQ.processPosFile(layer);
+                        }
+                        if (type == PV.Global.QUARKJS.ITEM) {
+                            PVQ.processItemFile(layer);
                         }
                     });
                 
