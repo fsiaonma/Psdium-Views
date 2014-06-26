@@ -61,6 +61,3 @@
 ### 4.重启 cs6，文件->脚本->PsdiumViews,点击运行即可。
 
 ![alt text](./demo.png "Title")
-
-power by uc游戏大厅
-===================
